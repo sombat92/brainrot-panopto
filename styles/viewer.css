@@ -605,7 +605,7 @@
   right: 20px;
   bottom: 20px;
   width: 280px; /* match sidebar width */
-  height: 600px;
+  height: 535px; /* Adjusted to fit one reel perfectly (264px reel + 16px padding + ~55px header) */
   background: #000; /* closer to Instagram reels */
   border-radius: 20px;
   display: flex;
@@ -733,6 +733,9 @@
   background: #000;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  scroll-snap-type: y proximity; /* Lighter snapping - feels more natural */
+  height: 0; /* Allow flex to control height, but constrain scroll */
+  min-height: 0;
 }
 
 .reels-container::-webkit-scrollbar {
@@ -745,16 +748,12 @@
   aspect-ratio: 9 / 16;
   border-radius: 12px;
   overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-.reel-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
 
 .reel-video {
   width: 100%;
