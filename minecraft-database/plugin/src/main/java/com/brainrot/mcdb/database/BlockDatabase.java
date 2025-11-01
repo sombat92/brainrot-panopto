@@ -5,6 +5,7 @@ import com.brainrot.mcdb.models.BlockPosition;
 import com.brainrot.mcdb.models.DataAddress;
 import com.brainrot.mcdb.models.DataEntry;
 import com.brainrot.mcdb.utils.ConfigManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -49,6 +50,46 @@ public class BlockDatabase {
         
         // Scan and rebuild index from existing blocks
         rebuildIndex();
+        
+        // Initialize database area with AIR blocks if empty
+        Bukkit.getScheduler().runTask(plugin, this::initializeDatabaseArea);
+    }
+    
+    /**
+     * Initialize database area with AIR blocks on first run
+     * This ensures the findAvailableSpace method can find AIR blocks
+     */
+    private void initializeDatabaseArea() {
+        if (!index.isEmpty()) {
+            plugin.getLogger().info("Database area already has " + index.size() + " entries, skipping initialization");
+            return;
+        }
+        
+        plugin.getLogger().info("Initializing database area with AIR blocks...");
+        
+        BlockPosition start = chunkManager.getStartPosition();
+        BlockPosition end = chunkManager.getEndPosition();
+        
+        int blocksSet = 0;
+        int blocksChecked = 0;
+        
+        for (int y = start.getY(); y <= end.getY(); y++) {
+            for (int z = start.getZ(); z <= end.getZ(); z++) {
+                for (int x = start.getX(); x <= end.getX(); x++) {
+                    Block block = chunkManager.getWorld().getBlockAt(x, y, z);
+                    blocksChecked++;
+                    
+                    if (block.getType() != Material.AIR) {
+                        block.setType(Material.AIR);
+                        blocksSet++;
+                    }
+                }
+            }
+        }
+        
+        plugin.getLogger().info("Database area ready: " + 
+            blocksChecked + " blocks checked, " + 
+            blocksSet + " converted to AIR");
     }
     
     public void shutdown() {
@@ -255,13 +296,26 @@ public class BlockDatabase {
         BlockPosition start = chunkManager.getStartPosition();
         BlockPosition end = chunkManager.getEndPosition();
         
+        plugin.getLogger().info("Finding space for " + blocksNeeded + " blocks");
+        plugin.getLogger().info("Search range: " + start + " to " + end);
+        plugin.getLogger().info("Current write position: " + currentWritePosition);
+        
         BlockPosition pos = currentWritePosition;
+        int attempts = 0;
+        int maxAttempts = 1000;
         
         // Linear search for available space
-        while (true) {
+        while (attempts < maxAttempts) {
             if (isSpaceAvailable(pos, blocksNeeded)) {
+                plugin.getLogger().info("Found space at: " + pos + " after " + attempts + " attempts");
                 currentWritePosition = pos.offset(blocksNeeded, 0, 0);
                 return pos;
+            }
+            
+            // Log first few attempts
+            if (attempts < 5) {
+                Block block = chunkManager.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
+                plugin.getLogger().info("Attempt " + attempts + " at " + pos + ": block type = " + block.getType());
             }
             
             // Move to next position
@@ -275,10 +329,15 @@ public class BlockDatabase {
                 pos = new BlockPosition(start.getX(), pos.getY() + 1, start.getZ());
             }
             if (pos.getY() > end.getY()) {
-                // No space available
+                plugin.getLogger().warning("Exceeded Y boundary after " + attempts + " attempts");
                 return null;
             }
+            
+            attempts++;
         }
+        
+        plugin.getLogger().warning("Max attempts (" + maxAttempts + ") reached without finding space");
+        return null;
     }
     
     private boolean isSpaceAvailable(BlockPosition start, int count) {

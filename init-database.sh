@@ -1,0 +1,53 @@
+#!/bin/bash
+
+echo "🔧 Initializing Minecraft Database Area"
+echo ""
+echo "To initialize the database, you need to run commands in the Minecraft server console."
+echo ""
+echo "Option 1: Join the server and run commands"
+echo "=========================================="
+echo ""
+echo "1. Open Minecraft Java Edition"
+echo "2. Go to Multiplayer → Add Server"
+echo "3. Server Address: localhost"
+echo "4. Join the server"
+echo "5. Press T to open chat and run these commands:"
+echo ""
+echo "   /op YourMinecraftUsername"
+echo "   /fill 0 64 0 63 100 63 minecraft:air"
+echo ""
+echo "Option 2: Use server console"
+echo "=========================================="
+echo ""
+echo "If you started the server in a terminal, you can type directly:"
+echo ""
+echo "   fill 0 64 0 63 100 63 minecraft:air"
+echo ""
+echo "(Commands in server console don't need the / prefix)"
+echo ""
+echo "Option 3: Auto-initialization (recommended)"
+echo "=========================================="
+echo ""
+echo "I can add auto-initialization to the plugin. Would you like me to do that?"
+echo ""
+
+# Try to send command if screen session exists
+if screen -list | grep -q "minecraft"; then
+    echo "Found screen session! Sending initialization command..."
+    screen -S minecraft -X stuff "fill 0 64 0 63 100 63 minecraft:air$(printf \\r)"
+    echo "✅ Command sent!"
+else
+    echo "Server is running in background. To send commands:"
+    echo "1. Find the server terminal window"
+    echo "2. Type: fill 0 64 0 63 100 63 minecraft:air"
+    echo "3. Press Enter"
+fi
+
+echo ""
+echo "After initialization, test with:"
+echo ""
+echo "curl -X POST http://localhost:3001/mcdb/write \\"
+echo "  -H \"Content-Type: application/json\" \\"
+echo "  -d '{\"key\":\"test\",\"value\":\"Hello World!\"}'"
+echo ""
+
