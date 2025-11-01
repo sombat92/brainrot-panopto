@@ -15,12 +15,6 @@ const app = express();
 
 app.use(cors());
 
-// Serve static files from assets and public directories
-app.use("/assets", express.static(__dirname + "/assets"));
-app.use("/public", express.static(__dirname + "/public"));
-app.use("/styles", express.static(__dirname + "/styles"));
-app.use("/scripts", express.static(__dirname + "/scripts"));
-
 const s3 = new cloudflare.S3Client({
     "region": "auto",
     endpoint: process.env.R2_ENDPOINT,
@@ -45,9 +39,12 @@ app.get("/", (req, res) => {
 app.get("/functions.js", (req, res) => {
     res.sendFile("functions.js", {root: __dirname});
 });
-app.use("/scripts", express.static(__dirname + "/scripts"));
-app.use("/styles", express.static(__dirname + "/styles"));
+
+// Serve static files from assets and public directories
+app.use("/assets", express.static(__dirname + "/assets"));
 app.use("/public", express.static(__dirname + "/public"));
+app.use("/styles", express.static(__dirname + "/styles"));
+app.use("/scripts", express.static(__dirname + "/scripts"));
 
 
 // Reads a file from Cloudflare brainrot-panopto bucket
