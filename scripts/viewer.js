@@ -18,23 +18,7 @@ let reelsOffsetY = 0
 let isDraggingProgress = false
 let currentLecture = null
 
-const lecturesData = [
-  {
-    id: "1",
-    title: "IA - Introductory Lectures",
-    module: "IA Engineering",
-    instructor: "Chris Rogers",
-    date: "8 Oct 2023",
-    duration: "1:19:20",
-  },
-]
-
-const reelsData = [
-  { id: "1", img: "https://picsum.photos/280/480?random=1" },
-  { id: "2", img: "https://picsum.photos/280/480?random=2" },
-  { id: "3", img: "httpsum.photos/280/480?random=3" },
-  { id: "4", img: "https://picsum.photos/280/480?random=4" },
-]
+// lecturesData and reelsData are defined in data.js which loads before this file
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
@@ -59,7 +43,9 @@ function setupReels() {
     const reelItem = document.createElement("div")
     reelItem.className = "reel-item"
     reelItem.innerHTML = `
-      <img src="${reel.img}" alt="Reel" class="reel-image">
+      <video class="reel-video" muted loop playsinline>
+        <source src="${reel.video}" type="video/mp4">
+      </video>
       <div class="reel-overlay">
         <div class="reel-icon">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -67,39 +53,116 @@ function setupReels() {
       </div>
     `
     reelsContainer.appendChild(reelItem)
+    
+    // Auto-play videos on hover
+    const video = reelItem.querySelector(".reel-video")
+    reelItem.addEventListener("mouseenter", () => {
+      video.play().catch(() => {})
+    })
+    reelItem.addEventListener("mouseleave", () => {
+      video.pause()
+      video.currentTime = 0
+    })
   })
 
-  // Drag handle (header preferred)
-  const dragHandle = reelsPopup.querySelector(".reels-header") || reelsPopup
-
-  dragHandle.addEventListener("pointerdown", startDraggingReels)
-  window.addEventListener("pointermove", dragReels)
-  window.addEventListener("pointerup", stopDraggingReels)
+  // Drag handle setup
+  const dragHandle = reelsPopup.querySelector(".reels-header")
+  if (!dragHandle) return
+  
+  // Helper function to check if click is in header
+  const isClickInHeader = (e) => {
+    const headerRect = dragHandle.getBoundingClientRect()
+    const x = e.clientX || e.touches?.[0]?.clientX
+    const y = e.clientY || e.touches?.[0]?.clientY
+    return x >= headerRect.left && x <= headerRect.right &&
+           y >= headerRect.top && y <= headerRect.bottom
+  }
+  
+  // Primary drag handler
+  const handleDragStart = (e) => {
+    if (e.type === 'mousedown' && e.button !== 0) return
+    e.stopPropagation()
+    e.preventDefault()
+    startDraggingReels(e)
+    return false
+  }
+  
+  // Attach listeners
+  dragHandle.addEventListener("pointerdown", handleDragStart, true)
+  dragHandle.addEventListener("mousedown", handleDragStart, true)
+  dragHandle.addEventListener("touchstart", handleDragStart, true)
+  
+  // Backup: coordinate-based listener on popup
+  const handlePopupClick = (e) => {
+    if (isClickInHeader(e)) {
+      e.stopPropagation()
+      startDraggingReels(e)
+    }
+  }
+  reelsPopup.addEventListener("pointerdown", handlePopupClick)
+  reelsPopup.addEventListener("mousedown", handlePopupClick)
+  
+  // Disable pointer events on header children
+  const headerChildren = dragHandle.querySelectorAll('*')
+  headerChildren.forEach(child => {
+    child.style.pointerEvents = 'none'
+  })
+  
+  // Ensure header can receive events
+  dragHandle.style.pointerEvents = 'auto'
+  dragHandle.style.cursor = 'grab'
+  
+  // Use document instead of window for better event capture
+  document.addEventListener("pointermove", dragReels, true)
+  document.addEventListener("mousemove", dragReels, true) // Fallback
+  document.addEventListener("pointerup", stopDraggingReels, true)
+  document.addEventListener("mouseup", stopDraggingReels, true) // Fallback
 }
 
 function startDraggingReels(e) {
   if (!reelsPopup) return
-
+  
   isDraggingReels = true
   reelsPopup.classList.add("dragging")
 
+  // Support both mouse and touch/pointer events
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+  
   const rect = reelsPopup.getBoundingClientRect()
-  reelsOffsetX = e.clientX - rect.left
-  reelsOffsetY = e.clientY - rect.top
+  reelsOffsetX = clientX - rect.left
+  reelsOffsetY = clientY - rect.top
 
   reelsPopup.style.position = "fixed"
   reelsPopup.style.right = "auto"
   reelsPopup.style.bottom = "auto"
 
-  e.target.setPointerCapture(e.pointerId)
+  // Use currentTarget (the header) instead of target (which might be a child with pointer-events: none)
+  // Only set pointer capture for pointer events, not mouse events
+  if (e.type.startsWith("pointer") && e.currentTarget && e.currentTarget.setPointerCapture && e.pointerId !== undefined) {
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch (err) {
+      // Silently fail
+    }
+  }
   e.preventDefault()
+  e.stopPropagation()
 }
 
 function dragReels(e) {
-  if (!isDraggingReels) return
+  if (!isDraggingReels) {
+    return
+  }
 
-  let newLeft = e.clientX - reelsOffsetX
-  let newTop = e.clientY - reelsOffsetY
+  // Support both mouse and touch/pointer events
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+  
+  if (clientX === undefined || clientY === undefined) return
+
+  let newLeft = clientX - reelsOffsetX
+  let newTop = clientY - reelsOffsetY
 
   const rect = reelsPopup.getBoundingClientRect()
   newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - rect.width))
@@ -114,7 +177,11 @@ function dragReels(e) {
 function stopDraggingReels(e) {
   isDraggingReels = false
   reelsPopup.classList.remove("dragging")
-  try { e.target.releasePointerCapture(e.pointerId) } catch {}
+  
+  const dragHandle = reelsPopup.querySelector(".reels-header")
+  if (dragHandle && dragHandle.hasPointerCapture && dragHandle.hasPointerCapture(e.pointerId)) {
+    try { dragHandle.releasePointerCapture(e.pointerId) } catch {}
+  }
 }
 
 /* ============================================================================

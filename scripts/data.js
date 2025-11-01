@@ -104,10 +104,7 @@ const lecturesData = [
 
 // Sample reel data for side panels
 const reelsData = [
-  { id: 1, img: "/tech-tips-1.jpg" },
-  { id: 2, img: "/programming-meme-1.jpg" },
-  { id: 3, img: "/coding-humor-1.jpg" },
-  { id: 4, img: "/developer-life-1.jpg" },
-  { id: 5, img: "/tech-motivation-1.jpg" },
-  { id: 6, img: "/coding-tips-1.jpg" },
+  { id: 1, video: "/assets/reel1.mp4" },
+  { id: 2, video: "/assets/reel2.mp4" },
+  { id: 3, video: "/assets/reel3.mp4" },
 ]

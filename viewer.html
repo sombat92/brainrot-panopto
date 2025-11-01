@@ -194,41 +194,76 @@
           </svg>
         </div>
         <div class="reels-profiles">
-          <div class="profile-circle"></div>
-          <div class="profile-circle"></div>
-          <div class="profile-circle"></div>
+          <div class="profile-circle-wrapper">
+            <div class="profile-circle"></div>
+            <svg class="profile-icon profile-heart" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <div class="profile-circle-wrapper">
+            <div class="profile-circle"></div>
+            <svg class="profile-icon profile-heart" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <div class="profile-circle-wrapper">
+            <div class="profile-circle"></div>
+            <svg class="profile-icon profile-arrow" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
     <div class="reels-container" id="reels-container"></div>
     <div class="reels-actions" id="reels-actions">
       <div class="action-item" title="Like">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <span class="action-count">2.3k</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span class="action-count">23K</span>
       </div>
       <div class="action-item" title="Comment">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
         <span class="action-count">652</span>
       </div>
       <div class="action-item" title="Share">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><path d="M23 6l-3 3M4 6l3 3M2 12h20M6 19l3-3m12 3l-3-3"/></svg>
-        <span class="action-count">1.1k</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        <span class="action-count">15.1K</span>
+      </div>
+      <div class="action-item" title="More">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="1.5"/>
+          <circle cx="12" cy="5" r="1.5"/>
+          <circle cx="12" cy="19" r="1.5"/>
+        </svg>
+      </div>
+      <div class="action-item action-music" title="Music">
+        <div class="music-profile"></div>
+        <svg class="music-note" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
       </div>
     </div>
     <div class="reels-footer">
       <div class="reels-user-info">
-        <div class="reels-avatar">IG</div>
+        <div class="reels-avatar">FF</div>
         <div class="reels-user-details">
-          <p class="reels-username">instagram_user</p>
-          <button class="reels-follow-btn">Follow</button>
+          <div class="reels-username-row">
+            <span class="reels-username">frenchie_fry39</span>
+            <svg class="reels-verified" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <button class="reels-follow-btn">Follow</button>
+          </div>
         </div>
       </div>
-      <p class="reels-description">An example caption for this reel showing how it would look.</p>
-      <div class="reels-nav">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-      </div>
+      <p class="reels-description">The otherworldly feeling you get when you d...</p>
     </div>
   </div>
 
