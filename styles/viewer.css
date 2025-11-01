@@ -766,7 +766,7 @@
 .reels-actions {
   position: absolute;
   right: 12px;
-  top: 60px;
+  bottom: 80px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -801,32 +801,6 @@
   font-weight: 600;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.action-music {
-  margin-top: 8px;
-  position: relative;
-}
-
-.music-profile {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: 3px solid white;
-  position: relative;
-}
-
-.music-note {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 16px;
-  height: 16px;
-  background: white;
-  border-radius: 50%;
-  padding: 2px;
-  color: #000;
 }
 
 /* Instagram-style footer info - positioned at bottom */
@@ -1013,5 +987,346 @@
   .slide-thumbnail {
     width: 80px;
     height: 50px;
+  }
+}
+
+/* ============================================================================
+   iPhone Style Popup (Popup 2) - With iPhone Frame Image
+   Actual image dimensions: 840 x 859 pixels
+   Screen area coordinates (from bottom-right origin):
+   - Top left: (253, 112) from bottom-right
+   - Bottom right: (592, 702) from bottom-right
+============================================================================ */
+.reels-popup-iphone {
+  right: 320px;
+  /* Actual frame dimensions */
+  --frame-width: 840px;
+  --frame-height: 859px;
+  
+  /* Screen area coordinates with bottom-right origin */
+  /* Origin at bottom-right: x increases LEFT, y increases toward TOP of image */
+  /* User specified: */
+  /* - Visual top-left of screen: (253, 112) */
+  /* - Visual bottom-right of screen: (592, 702) */
+  
+  /* If y increases toward top (away from bottom), then: */
+  /* Top-left (253, 112): 253px from right, 112px from bottom (toward top) */
+  /*   CSS: left = 840-253 = 587, top = 112 */
+  /* Bottom-right (592, 702): 592px from right, 702px from bottom (toward top) */
+  /*   CSS: left = 840-592 = 248, top = 702 */
+  
+  /* Final screen area in CSS coordinates: */
+  --screen-left: 248px;
+  --screen-top: 112px;
+  --screen-width: 339px;
+  --screen-height: 590px;
+  
+  /* Scale to reasonable size */
+  --scale-factor: 0.65;
+  
+  width: calc(var(--frame-width) * var(--scale-factor));
+  height: calc(var(--frame-height) * var(--scale-factor));
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  position: relative;
+}
+
+/* iPhone frame background with transparency preserved */
+.reels-popup-iphone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/assets/iphoneframe.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+/* Debug mode: uncomment to see screen area boundaries */
+/* .reels-popup-iphone .reels-container {
+  outline: 2px dashed red;
+} */
+
+/* Hide the old custom iPhone elements */
+.iphone-notch,
+.iphone-speaker,
+.iphone-camera,
+.iphone-home-indicator {
+  display: none;
+}
+
+.reels-popup-iphone .reels-header {
+  position: absolute;
+  /* Position header at top of screen area */
+  left: calc(var(--screen-left) * var(--scale-factor));
+  top: calc(var(--screen-top) * var(--scale-factor));
+  width: calc(var(--screen-width) * var(--scale-factor));
+  height: 35px;
+  background: transparent;
+  backdrop-filter: none;
+  z-index: 2001;
+  margin: 0;
+  padding: 6px 12px;
+}
+
+.reels-popup-iphone .reels-container {
+  position: absolute;
+  /* Position content area within screen bounds */
+  left: calc(var(--screen-left) * var(--scale-factor));
+  top: calc((var(--screen-top) + 35) * var(--scale-factor));
+  width: calc(var(--screen-width) * var(--scale-factor));
+  height: calc((var(--screen-height) - 35) * var(--scale-factor));
+  border-radius: 0;
+  padding: 4px;
+  background: #000;
+  z-index: 1999;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: y proximity;
+}
+
+.reels-popup-iphone .reels-container::-webkit-scrollbar {
+  display: none;
+}
+
+.reels-popup-iphone .reel-item {
+  border-radius: 6px;
+  border: none;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.reels-popup-iphone .reel-item:last-child {
+  margin-bottom: 0;
+}
+
+.reels-popup-iphone .reels-actions {
+  /* Position actions on right side of first visible reel */
+  left: calc((var(--screen-left) + var(--screen-width) - 40) * var(--scale-factor));
+  top: auto;
+  bottom: calc((859 - var(--screen-top) - var(--screen-height) + 80) * var(--scale-factor));
+  right: auto;
+  position: absolute;
+  z-index: 2002;
+}
+
+.reels-popup-iphone .reels-footer {
+  /* Position footer at bottom of screen area */
+  left: calc(var(--screen-left) * var(--scale-factor));
+  bottom: calc((859 - var(--screen-top) - var(--screen-height)) * var(--scale-factor));
+  width: calc(var(--screen-width) * var(--scale-factor));
+  right: auto;
+  position: absolute;
+  z-index: 2002;
+}
+
+/* ============================================================================
+   Windows 95 Style Popup (Popup 3)
+============================================================================ */
+.reels-popup-win95 {
+  right: 620px;
+  width: 300px;
+  height: 560px;
+  background: #c0c0c0;
+  border: none;
+  border-radius: 0;
+  box-shadow: inset -1px -1px 0 #000000,
+              inset 1px 1px 0 #ffffff,
+              inset -2px -2px 0 #808080,
+              inset 2px 2px 0 #dfdfdf,
+              4px 4px 8px rgba(0, 0, 0, 0.5);
+  padding: 0;
+}
+
+.win95-titlebar {
+  height: 24px;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 2px 4px;
+  cursor: grab;
+  user-select: none;
+  position: relative;
+  z-index: 1001;
+}
+
+.win95-title {
+  color: #fff;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.win95-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.win95-btn {
+  width: 16px;
+  height: 14px;
+  background: #c0c0c0;
+  border: none;
+  box-shadow: inset -1px -1px 0 #000000,
+              inset 1px 1px 0 #ffffff,
+              inset -2px -2px 0 #808080,
+              inset 2px 2px 0 #dfdfdf;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.win95-btn:active {
+  box-shadow: inset 1px 1px 0 #000000,
+              inset -1px -1px 0 #ffffff;
+}
+
+.win95-close {
+  color: #000;
+}
+
+.win95-menubar {
+  height: 20px;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 8px;
+  cursor: grab;
+}
+
+.win95-menu-item {
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.win95-menu-item:hover {
+  background: #000080;
+  color: #fff;
+}
+
+.reels-popup-win95 .reels-container {
+  background: #000;
+  border: 2px solid;
+  border-color: #808080 #dfdfdf #dfdfdf #808080;
+  padding: 4px;
+  height: calc(100% - 24px - 20px - 20px);
+}
+
+.reels-popup-win95 .reel-item {
+  border-radius: 0;
+  border: 1px solid #808080;
+}
+
+.reels-popup-win95 .reel-video {
+  border-radius: 0;
+}
+
+.reels-popup-win95 .reels-footer {
+  background: #c0c0c0;
+  border-top: 2px solid;
+  border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  padding: 4px 8px;
+}
+
+.reels-popup-win95 .reels-avatar {
+  background: #000080;
+  border: 1px solid #808080;
+}
+
+.reels-popup-win95 .reels-username {
+  color: #000;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+}
+
+.reels-popup-win95 .reels-description {
+  color: #000;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+}
+
+.win95-statusbar {
+  height: 20px;
+  background: #c0c0c0;
+  border-top: 1px solid #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  box-shadow: inset 0 1px 0 #dfdfdf;
+}
+
+.win95-status-text {
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+  padding: 2px 4px;
+  border: 1px solid;
+  border-color: #808080 #dfdfdf #dfdfdf #808080;
+  background: #c0c0c0;
+  flex: 1;
+}
+
+.reels-popup-win95 .reels-actions {
+  bottom: 100px;
+}
+
+.reels-popup-win95 .action-item svg {
+  stroke: #fff;
+}
+
+.reels-popup-win95 .action-count {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Make Windows 95 titlebar and menubar draggable */
+.reels-popup-win95.dragging .win95-titlebar,
+.reels-popup-win95.dragging .win95-menubar {
+  cursor: grabbing;
+}
+
+/* Stack popups on small screens */
+@media (max-width: 1200px) {
+  .reels-popup-iphone {
+    right: 20px;
+    bottom: auto;
+    top: 20px;
+    --scale-factor: 0.5;
+  }
+  
+  .reels-popup-win95 {
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    top: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .reels-popup,
+  .reels-popup-iphone,
+  .reels-popup-win95 {
+    display: none; /* Hide popups on mobile for better UX */
   }
 }
