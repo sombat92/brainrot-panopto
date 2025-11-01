@@ -10,9 +10,21 @@ const progressHandle = progressBar.querySelector(".progress-handle")
 const timeDisplay = document.getElementById("timeDisplay")
 
 const reelsPopup = document.getElementById("reels-popup")
-let isDraggingReels = false
-let reelsOffsetX = 0
-let reelsOffsetY = 0
+const reelsPopup2 = document.getElementById("reels-popup-2")
+const reelsPopup3 = document.getElementById("reels-popup-3")
+
+// Separate dragging state for each popup
+let isDraggingReels1 = false
+let reelsOffsetX1 = 0
+let reelsOffsetY1 = 0
+
+let isDraggingReels2 = false
+let reelsOffsetX2 = 0
+let reelsOffsetY2 = 0
+
+let isDraggingReels3 = false
+let reelsOffsetX3 = 0
+let reelsOffsetY3 = 0
 
 // State
 let isDraggingProgress = false
@@ -28,6 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabSwitching()
   loadNotesFromStorage()
   setupReels()
+  setupReels2()
+  setupReels3()
 })
 
 /* ============================================================================
@@ -79,6 +93,69 @@ function setupReels() {
   // Observe all reel items
   videos.forEach(({ reelItem }) => {
     observer.observe(reelItem)
+  })
+
+  // Autoscroll functionality
+  let currentReelIndex = 0
+  let autoscrollTimeout = null
+  
+  const getRandomInterval = () => {
+    // Random interval between 3-7 seconds (mean ~5 seconds)
+    return Math.floor(Math.random() * 4000) + 3000
+  }
+  
+  const scrollToReel = (index) => {
+    if (index >= videos.length) {
+      index = 0 // Loop back to first reel
+    }
+    
+    const targetReel = videos[index].reelItem
+    targetReel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    currentReelIndex = index
+  }
+  
+  const scheduleNextScroll = () => {
+    const interval = getRandomInterval()
+    autoscrollTimeout = setTimeout(() => {
+      currentReelIndex = (currentReelIndex + 1) % videos.length
+      scrollToReel(currentReelIndex)
+      scheduleNextScroll() // Schedule the next scroll with a new random interval
+    }, interval)
+  }
+  
+  const startAutoscroll = () => {
+    scheduleNextScroll()
+  }
+  
+  const stopAutoscroll = () => {
+    clearTimeout(autoscrollTimeout)
+  }
+  
+  // Start autoscroll after a brief delay
+  setTimeout(() => {
+    startAutoscroll()
+  }, 1000)
+  
+  // Pause autoscroll when user interacts with the container
+  let userInteractionTimeout = null
+  reelsContainer.addEventListener('wheel', () => {
+    stopAutoscroll()
+    clearTimeout(userInteractionTimeout)
+    
+    // Resume autoscroll after 10 seconds of no interaction
+    userInteractionTimeout = setTimeout(() => {
+      startAutoscroll()
+    }, 10000)
+  })
+  
+  reelsContainer.addEventListener('touchstart', () => {
+    stopAutoscroll()
+    clearTimeout(userInteractionTimeout)
+    
+    // Resume autoscroll after 10 seconds of no interaction
+    userInteractionTimeout = setTimeout(() => {
+      startAutoscroll()
+    }, 10000)
   })
 
   // Drag handle setup
@@ -138,7 +215,12 @@ function setupReels() {
 function startDraggingReels(e) {
   if (!reelsPopup) return
   
-  isDraggingReels = true
+  // Bring to front
+  reelsPopup.style.zIndex = '1002'
+  if (reelsPopup2) reelsPopup2.style.zIndex = '1001'
+  if (reelsPopup3) reelsPopup3.style.zIndex = '1000'
+  
+  isDraggingReels1 = true
   reelsPopup.classList.add("dragging")
 
   // Support both mouse and touch/pointer events
@@ -146,8 +228,8 @@ function startDraggingReels(e) {
   const clientY = e.clientY ?? e.touches?.[0]?.clientY
   
   const rect = reelsPopup.getBoundingClientRect()
-  reelsOffsetX = clientX - rect.left
-  reelsOffsetY = clientY - rect.top
+  reelsOffsetX1 = clientX - rect.left
+  reelsOffsetY1 = clientY - rect.top
 
   reelsPopup.style.position = "fixed"
   reelsPopup.style.right = "auto"
@@ -167,7 +249,7 @@ function startDraggingReels(e) {
 }
 
 function dragReels(e) {
-  if (!isDraggingReels) {
+  if (!isDraggingReels1) {
     return
   }
 
@@ -177,8 +259,8 @@ function dragReels(e) {
   
   if (clientX === undefined || clientY === undefined) return
 
-  let newLeft = clientX - reelsOffsetX
-  let newTop = clientY - reelsOffsetY
+  let newLeft = clientX - reelsOffsetX1
+  let newTop = clientY - reelsOffsetY1
 
   const rect = reelsPopup.getBoundingClientRect()
   newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - rect.width))
@@ -191,7 +273,7 @@ function dragReels(e) {
 }
 
 function stopDraggingReels(e) {
-  isDraggingReels = false
+  isDraggingReels1 = false
   reelsPopup.classList.remove("dragging")
   
   const dragHandle = reelsPopup.querySelector(".reels-header")
@@ -350,4 +432,269 @@ function loadNotesFromStorage() {
     const notesText = notesTextarea.value
     localStorage.setItem("notes-" + lectureId, notesText)
   })
+}
+
+/* ============================================================================
+   iPhone Popup (Popup 2) Setup
+============================================================================ */
+function setupReels2() {
+  const reelsContainer = document.getElementById("reels-container-2")
+  if (!reelsPopup2 || !reelsContainer) return
+
+  // Render reel list
+  const videos = []
+  reelsDataIphone.forEach((reel) => {
+    const reelItem = document.createElement("div")
+    reelItem.className = "reel-item"
+    reelItem.innerHTML = `
+      <video class="reel-video" loop playsinline>
+        <source src="${reel.video}" type="video/mp4">
+      </video>
+    `
+    reelsContainer.appendChild(reelItem)
+    
+    const video = reelItem.querySelector(".reel-video")
+    videos.push({ video, reelItem })
+  })
+
+  // Use Intersection Observer to auto-play only visible reels
+  const observerOptions = {
+    root: reelsContainer,
+    rootMargin: '0px',
+    threshold: 0.5
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target.querySelector('.reel-video')
+      if (!video) return
+
+      if (entry.isIntersecting) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    })
+  }, observerOptions)
+
+  videos.forEach(({ reelItem }) => {
+    observer.observe(reelItem)
+  })
+
+  // Drag handle setup for iPhone
+  const dragHandle = reelsPopup2.querySelector(".iphone-header")
+  if (!dragHandle) return
+  
+    dragHandle.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return
+      e.stopPropagation()
+      e.preventDefault()
+      startDragging2(e)
+    }, true)
+  
+  dragHandle.style.pointerEvents = 'auto'
+  dragHandle.style.cursor = 'grab'
+  
+  const headerChildren = dragHandle.querySelectorAll('*')
+  headerChildren.forEach(child => {
+    child.style.pointerEvents = 'none'
+  })
+}
+
+function startDragging2(e) {
+  if (!reelsPopup2) return
+  
+  // Bring to front
+  reelsPopup2.style.zIndex = '1002'
+  if (reelsPopup) reelsPopup.style.zIndex = '1001'
+  if (reelsPopup3) reelsPopup3.style.zIndex = '1000'
+  
+  isDraggingReels2 = true
+  reelsPopup2.classList.add("dragging")
+
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+  
+  const rect = reelsPopup2.getBoundingClientRect()
+  reelsOffsetX2 = clientX - rect.left
+  reelsOffsetY2 = clientY - rect.top
+
+  reelsPopup2.style.position = "fixed"
+  reelsPopup2.style.right = "auto"
+  reelsPopup2.style.bottom = "auto"
+
+  if (e.pointerId !== undefined) {
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch (err) {}
+  }
+
+  document.addEventListener("pointermove", dragReels2, true)
+  document.addEventListener("pointerup", stopDragging2, true)
+}
+
+function dragReels2(e) {
+  if (!isDraggingReels2 || !reelsPopup2) return
+
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+
+  const x = clientX - reelsOffsetX2
+  const y = clientY - reelsOffsetY2
+
+  reelsPopup2.style.left = x + "px"
+  reelsPopup2.style.top = y + "px"
+}
+
+function stopDragging2(e) {
+  if (!isDraggingReels2 || !reelsPopup2) return
+
+  isDraggingReels2 = false
+  reelsPopup2.classList.remove("dragging")
+
+  if (e.pointerId !== undefined) {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch (err) {}
+  }
+
+  document.removeEventListener("pointermove", dragReels2, true)
+  document.removeEventListener("pointerup", stopDragging2, true)
+}
+
+/* ============================================================================
+   Windows 95 Popup (Popup 3) Setup
+============================================================================ */
+function setupReels3() {
+  const reelsContainer = document.getElementById("reels-container-3")
+  if (!reelsPopup3 || !reelsContainer) return
+
+  // Render reel list
+  const videos = []
+  reelsData.forEach((reel) => {
+    const reelItem = document.createElement("div")
+    reelItem.className = "reel-item"
+    reelItem.innerHTML = `
+      <video class="reel-video" loop playsinline>
+        <source src="${reel.video}" type="video/mp4">
+      </video>
+    `
+    reelsContainer.appendChild(reelItem)
+    
+    const video = reelItem.querySelector(".reel-video")
+    videos.push({ video, reelItem })
+  })
+
+  // Use Intersection Observer to auto-play only visible reels
+  const observerOptions = {
+    root: reelsContainer,
+    rootMargin: '0px',
+    threshold: 0.5
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target.querySelector('.reel-video')
+      if (!video) return
+
+      if (entry.isIntersecting) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    })
+  }, observerOptions)
+
+  videos.forEach(({ reelItem }) => {
+    observer.observe(reelItem)
+  })
+
+  // Drag handle setup for Windows 95 - titlebar and menubar
+  const titlebar = reelsPopup3.querySelector(".win95-titlebar")
+  const menubar = reelsPopup3.querySelector(".win95-menubar")
+  
+  const setupDragHandle = (dragHandle) => {
+    if (!dragHandle) return
+    
+    dragHandle.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return
+      e.stopPropagation()
+      e.preventDefault()
+      startDragging3(e)
+    }, true)
+    
+    dragHandle.style.pointerEvents = 'auto'
+    dragHandle.style.cursor = 'grab'
+    
+    const children = dragHandle.querySelectorAll('*:not(.win95-btn)')
+    children.forEach(child => {
+      if (!child.classList.contains('win95-btn')) {
+        child.style.pointerEvents = 'none'
+      }
+    })
+  }
+  
+  setupDragHandle(titlebar)
+  setupDragHandle(menubar)
+}
+
+function startDragging3(e) {
+  if (!reelsPopup3) return
+  
+  // Bring to front
+  reelsPopup3.style.zIndex = '1002'
+  if (reelsPopup) reelsPopup.style.zIndex = '1001'
+  if (reelsPopup2) reelsPopup2.style.zIndex = '1000'
+  
+  isDraggingReels3 = true
+  reelsPopup3.classList.add("dragging")
+
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+  
+  const rect = reelsPopup3.getBoundingClientRect()
+  reelsOffsetX3 = clientX - rect.left
+  reelsOffsetY3 = clientY - rect.top
+
+  reelsPopup3.style.position = "fixed"
+  reelsPopup3.style.right = "auto"
+  reelsPopup3.style.bottom = "auto"
+
+  if (e.pointerId !== undefined) {
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch (err) {}
+  }
+
+  document.addEventListener("pointermove", dragReels3, true)
+  document.addEventListener("pointerup", stopDragging3, true)
+}
+
+function dragReels3(e) {
+  if (!isDraggingReels3 || !reelsPopup3) return
+
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+
+  const x = clientX - reelsOffsetX3
+  const y = clientY - reelsOffsetY3
+
+  reelsPopup3.style.left = x + "px"
+  reelsPopup3.style.top = y + "px"
+}
+
+function stopDragging3(e) {
+  if (!isDraggingReels3 || !reelsPopup3) return
+
+  isDraggingReels3 = false
+  reelsPopup3.classList.remove("dragging")
+
+  if (e.pointerId !== undefined) {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch (err) {}
+  }
+
+  document.removeEventListener("pointermove", dragReels3, true)
+  document.removeEventListener("pointerup", stopDragging3, true)
 }
