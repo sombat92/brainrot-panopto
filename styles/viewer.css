@@ -739,23 +739,10 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
-.reels-container:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
-  pointer-events: none;
-  z-index: 1;
-}
-
 .reel-item {
   position: relative;
   width: 100%;
   aspect-ratio: 9 / 16;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%);
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -772,48 +759,15 @@
 .reel-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 12px;
-}
-
-.reel-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-  border-radius: 12px;
-}
-
-.reel-item:hover .reel-overlay {
-  opacity: 1;
-}
-
-.reel-icon {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #667eea;
-}
-
-.reel-icon svg {
-  width: 20px;
-  height: 20px;
 }
 
 /* Instagram-style action sidebar - positioned on right side overlaying first reel */
 .reels-actions {
   position: absolute;
   right: 12px;
-  top: 20px;
+  top: 60px;
   display: flex;
   flex-direction: column;
   gap: 22px;

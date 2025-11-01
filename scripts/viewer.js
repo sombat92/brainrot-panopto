@@ -39,30 +39,46 @@ function setupReels() {
   if (!reelsPopup || !reelsContainer) return
 
   // Render reel list
+  const videos = []
   reelsData.forEach((reel) => {
     const reelItem = document.createElement("div")
     reelItem.className = "reel-item"
     reelItem.innerHTML = `
-      <video class="reel-video" muted loop playsinline>
+      <video class="reel-video" loop playsinline>
         <source src="${reel.video}" type="video/mp4">
       </video>
-      <div class="reel-overlay">
-        <div class="reel-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-      </div>
     `
     reelsContainer.appendChild(reelItem)
     
-    // Auto-play videos on hover
     const video = reelItem.querySelector(".reel-video")
-    reelItem.addEventListener("mouseenter", () => {
-      video.play().catch(() => {})
+    videos.push({ video, reelItem })
+  })
+
+  // Use Intersection Observer to auto-play only visible reels
+  const observerOptions = {
+    root: reelsContainer,
+    rootMargin: '0px',
+    threshold: 0.5 // Play when at least 50% visible
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target.querySelector('.reel-video')
+      if (!video) return
+
+      if (entry.isIntersecting) {
+        // Reel is in view - play it
+        video.play().catch(() => {})
+      } else {
+        // Reel is out of view - pause it
+        video.pause()
+      }
     })
-    reelItem.addEventListener("mouseleave", () => {
-      video.pause()
-      video.currentTime = 0
-    })
+  }, observerOptions)
+
+  // Observe all reel items
+  videos.forEach(({ reelItem }) => {
+    observer.observe(reelItem)
   })
 
   // Drag handle setup
