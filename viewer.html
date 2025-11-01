@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture Viewer</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/viewer.css">
+</head>
+<body>
+  <div class="viewer-container">
+    <!-- Header Navigation -->
+    <header class="viewer-header">
+      <div class="header-left">
+        <button class="back-button" onclick="window.location.href='/'">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
+          Back
+        </button>
+        <div class="breadcrumb">
+          <span id="lecture-module">Module</span>
+          <span class="breadcrumb-sep">›</span>
+          <span id="lecture-title-header">Lecture Title</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="help-button" title="Help">?</button>
+        <div class="user-avatar">HA</div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="viewer-main">
+      <!-- Left Sidebar Navigation -->
+      <aside class="viewer-sidebar">
+        <!-- Search -->
+        <div class="sidebar-search">
+          <input type="text" placeholder="Search this recording" id="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5S13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="sidebar-tabs">
+          <button class="tab-btn active" data-tab="details">Details</button>
+          <button class="tab-btn" data-tab="contents">Contents</button>
+          <button class="tab-btn" data-tab="captions">Captions</button>
+          <button class="tab-btn" data-tab="discussion">Discussion</button>
+          <button class="tab-btn" data-tab="bookmarks">Bookmarks</button>
+        </nav>
+
+        <!-- Tab Content -->
+        <div class="sidebar-content">
+          <!-- Details Tab -->
+          <div class="tab-content active" id="details-tab">
+            <div class="details-section">
+              <div class="instructor-info">
+                <div class="instructor-avatar">CR</div>
+                <div>
+                  <p class="instructor-name" id="lecture-instructor">Chris Rogers</p>
+                  <p class="instructor-title">Instructor</p>
+                </div>
+              </div>
+              <div class="lecture-stats">
+                <div class="stat">
+                  <span class="stat-label">Duration</span>
+                  <span class="stat-value" id="lecture-duration">1:19:20</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Date</span>
+                  <span class="stat-value" id="lecture-date">8 Oct 2023</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contents Tab -->
+          <div class="tab-content" id="contents-tab">
+            <div class="contents-list">
+              <div class="content-item">
+                <span class="content-time">0:00</span>
+                <span class="content-title">Introduction</span>
+              </div>
+              <div class="content-item">
+                <span class="content-time">5:30</span>
+                <span class="content-title">Main Topic</span>
+              </div>
+              <div class="content-item">
+                <span class="content-time">15:45</span>
+                <span class="content-title">Examples & Discussion</span>
+              </div>
+              <div class="content-item">
+                <span class="content-time">45:20</span>
+                <span class="content-title">Q&A Session</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Captions Tab -->
+          <div class="tab-content" id="captions-tab">
+            <div class="captions-list">
+              <p class="caption-item">No captions available</p>
+            </div>
+          </div>
+
+          <!-- Discussion Tab -->
+          <div class="tab-content" id="discussion-tab">
+            <div class="discussion-empty">
+              <p>No discussions yet</p>
+            </div>
+          </div>
+
+          <!-- Bookmarks Tab -->
+          <div class="tab-content" id="bookmarks-tab">
+            <div class="bookmarks-empty">
+              <p>No bookmarks yet</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Video Area -->
+      <main class="viewer-main-content">
+        <!-- Video Player -->
+        <div class="video-player-section">
+          <div class="video-container">
+            <video id="lecture-video" class="lecture-video">
+              <source src="https://commondatastorage.googleapis.com/gtv-videos-library/sample/BigBuckBunny.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+
+            <!-- Custom Controls -->
+            <div class="video-controls">
+              <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                  <div class="progress-fill"></div>
+                  <div class="progress-handle"></div>
+                </div>
+              </div>
+
+              <div class="controls-bottom">
+                <div class="controls-left">
+                  <button id="playPauseBtn" class="control-btn" title="Play/Pause" aria-label="Play/Pause">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </button>
+                  <button id="skipBackBtn" class="control-btn" title="Skip back 10s" aria-label="Skip back 10 seconds">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M11 18c4.41 0 8-3.59 8-8s-3.59-8-8-8-8 3.59-8 8 3.59 8 8 8m0-16c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m3.5-1h-2v6h2v-6M11 12h2V8h-2v4z"/>
+                    </svg>
+                    -10s
+                  </button>
+                  <button id="skipForwardBtn" class="control-btn" title="Skip forward 10s" aria-label="Skip forward 10 seconds">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M11 18c4.41 0 8-3.59 8-8s-3.59-8-8-8-8 3.59-8 8 3.59 8 8 8m0-16c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m3.5-1h-2v6h2v-6M11 12h2V8h-2v4z"/>
+                    </svg>
+                    +10s
+                  </button>
+                  <button id="muteBtn" class="control-btn" title="Mute/Unmute" aria-label="Mute">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="time-display" id="timeDisplay">0:00 / 1:19:20</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Section -->
+          <div class="notes-section">
+            <div class="notes-header">
+              <h3>Notes</h3>
+            </div>
+            <textarea id="notes-textarea" class="notes-textarea" placeholder="Add your notes here..."></textarea>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Reels Popup (Instagram-like) -->
+  <div id="reels-popup" class="reels-popup" aria-label="Instagram Reels">
+    <div class="reels-header">
+      <div class="reels-top">
+        <div class="reels-title">
+          <span class="reels-label">Reels</span>
+          <svg class="reels-dropdown-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M7 10l5 5 5-5z"/>
+          </svg>
+        </div>
+        <div class="reels-profiles">
+          <div class="profile-circle"></div>
+          <div class="profile-circle"></div>
+          <div class="profile-circle"></div>
+        </div>
+      </div>
+    </div>
+    <div class="reels-container" id="reels-container"></div>
+    <div class="reels-actions" id="reels-actions">
+      <div class="action-item" title="Like">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="action-count">2.3k</span>
+      </div>
+      <div class="action-item" title="Comment">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="action-count">652</span>
+      </div>
+      <div class="action-item" title="Share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><path d="M23 6l-3 3M4 6l3 3M2 12h20M6 19l3-3m12 3l-3-3"/></svg>
+        <span class="action-count">1.1k</span>
+      </div>
+    </div>
+    <div class="reels-footer">
+      <div class="reels-user-info">
+        <div class="reels-avatar">IG</div>
+        <div class="reels-user-details">
+          <p class="reels-username">instagram_user</p>
+          <button class="reels-follow-btn">Follow</button>
+        </div>
+      </div>
+      <p class="reels-description">An example caption for this reel showing how it would look.</p>
+      <div class="reels-nav">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <script src="/scripts/data.js"></script>
+  <script src="/scripts/viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture Viewer - Academic Portal</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/lecture-selection.css">
+</head>
+<body>
+  <div class="lecture-selection">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="university-logo">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+          </svg>
+          <span class="app-title">Academic Portal</span>
+        </div>
+      </div>
+      
+      <div class="search-container-header">
+        <input 
+          type="text" 
+          class="search-input-header" 
+          id="searchInput" 
+          placeholder="Search slides, notes, captions and more"
+        >
+      </div>
+
+      <div class="header-right">
+        <button class="header-icon-btn" aria-label="Help">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+        </button>
+        <button class="header-icon-btn profile-btn" aria-label="Profile">HA</button>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <button class="create-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+        Create
+      </button>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="home">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" data-section="subscriptions">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-8h3v-8zm-2 12H3V6h12v14zm-6-7.5h4V13h-4z"/>
+          </svg>
+          <span>Subscriptions</span>
+        </a>
+        <a href="#" class="nav-item" data-section="shared">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+          </svg>
+          <span>Shared with Me</span>
+        </a>
+        <a href="#" class="nav-item" data-section="everything">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+          </svg>
+          <span>Everything</span>
+        </a>
+        <a href="#" class="nav-item" data-section="browse">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/>
+          </svg>
+          <span>Browse</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Sections -->
+      <section class="lectures-section" id="subscriptions-section">
+        <div class="section-header">
+          <h2 class="section-title">Subscriptions</h2>
+          <a href="#" class="section-link">View all</a>
+        </div>
+        <div class="lectures-grid" id="subscriptions-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <section class="lectures-section" id="shared-section">
+        <div class="section-header">
+          <h2 class="section-title">Shared with Me</h2>
+          <a href="#" class="section-link">View all</a>
+        </div>
+        <div class="lectures-grid" id="shared-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <section class="lectures-section" id="whats-new-section">
+        <div class="section-header">
+          <h2 class="section-title">What's New</h2>
+          <a href="#" class="section-link">View all</a>
+        </div>
+        <div class="lectures-grid" id="whats-new-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Lecture Card Template (hidden) -->
+  <template id="lecture-card-template">
+    <div class="lecture-card">
+      <div class="lecture-thumbnail">
+        <img src="/placeholder.svg" alt="Lecture thumbnail" class="thumbnail-img">
+        <div class="duration-badge"></div>
+        <button class="play-button" aria-label="Play lecture">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="lecture-info">
+        <h3 class="lecture-title"></h3>
+        <p class="lecture-module"></p>
+      </div>
+    </div>
+  </template>
+
+  <script src="/scripts/data.js"></script>
+  <script src="/scripts/lecture-selection.js"></script>
+</body>
+</html>
