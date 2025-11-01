@@ -126,8 +126,8 @@
         <!-- Video Player -->
         <div class="video-player-section">
           <div class="video-container">
-            <video id="lecture-video" class="lecture-video">
-              <source src="https://commondatastorage.googleapis.com/gtv-videos-library/sample/BigBuckBunny.mp4" type="video/mp4">
+            <video id="lecture-video" class="lecture-video" id="LectureVideoPlayer">
+              <source src="" id="LectureVideoSource" type="video/mp4">
               Your browser does not support the video tag.
             </video>
 
@@ -269,5 +269,9 @@
 
   <script src="/scripts/data.js"></script>
   <script src="/scripts/viewer.js"></script>
+  <script src="/scripts/functions.js"></script>
+  <script>
+    GetVideo("LectureVideoSource", "LectureVideoPlayer", "lectures", "DE Intro.mp4");
+  </script>
 </body>
 </html>

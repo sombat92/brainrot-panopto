@@ -1,7 +1,7 @@
-function GetVideo(folder, fileName) {
+function GetVideo(sourceId, playerId, folder, fileName) {
     try {
-        const videoSource = document.getElementById('videoSource');
-        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSource = document.getElementById(sourceId);
+        const videoPlayer = document.getElementById(playerId);
         
         // Set the src attribute to our server endpoint
         videoSource.src = `/read-file?folder=${folder}&fileName=${fileName}`;

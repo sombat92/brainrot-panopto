@@ -36,9 +36,6 @@ app.get("/login", (req, res) => {
 app.get("/", (req, res) => {
     res.sendFile("index.html", {root: __dirname});
 });
-app.get("/functions.js", (req, res) => {
-    res.sendFile("functions.js", {root: __dirname});
-});
 
 // Serve static files from assets and public directories
 app.use("/assets", express.static(__dirname + "/assets"));
