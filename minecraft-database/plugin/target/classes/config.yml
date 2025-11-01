@@ -1,0 +1,107 @@
+# Minecraft Database Plugin Configuration
+# Use Minecraft chunks as a persistent database
+
+socket:
+  # Enable socket server
+  enabled: true
+  
+  # Host to bind to (0.0.0.0 for all interfaces, 127.0.0.1 for localhost only)
+  host: "0.0.0.0"
+  
+  # Port for socket connections
+  port: 25566
+  
+  # Authentication token (CHANGE THIS IN PRODUCTION!)
+  auth-token: "change-me-in-production-please"
+  
+  # Maximum concurrent connections
+  max-connections: 10
+  
+  # Connection timeout in seconds
+  timeout-seconds: 30
+
+database:
+  # World name where database chunks are located
+  world: "world"
+  
+  # Database storage area (permanently loaded chunks)
+  chunks:
+    # Starting chunk coordinates
+    start-x: 0
+    start-z: 0
+    
+    # Ending chunk coordinates (4x4 chunk area = 64x64 blocks)
+    end-x: 3
+    end-z: 3
+  
+  storage:
+    # Y-level range for data storage
+    min-y: 5      # Start at Y=5 (above bedrock)
+    max-y: 250    # Up to Y=250
+    
+    # Encoding method: "simple" (16 blocks = 4 bits) or "advanced" (256 blocks = 8 bits)
+    encoding: "simple"
+    
+    # How many blocks per data entry
+    blocks-per-key: 16
+    blocks-per-value: 32
+    
+    # Use compression for data
+    compression: true
+  
+  # Protection settings for database chunks
+  protection:
+    # Prevent players from breaking/placing blocks in database area
+    prevent-player-access: true
+    
+    # Prevent explosions in database area
+    prevent-explosions: true
+    
+    # Prevent block updates (water, lava, etc.)
+    prevent-block-updates: true
+    
+    # Prevent mob spawning in database area
+    prevent-mob-spawning: true
+    
+    # Teleport players this far away if they enter the area
+    teleport-distance: 100
+
+# Logging configuration
+logging:
+  # Log level: DEBUG, INFO, WARN, ERROR
+  level: "INFO"
+  
+  # Log all database operations
+  log-operations: true
+  
+  # Log socket connections
+  log-socket-connections: true
+  
+  # Log performance metrics
+  log-performance: false
+
+# Performance settings
+performance:
+  # Execute operations asynchronously when possible
+  async-operations: true
+  
+  # Batch multiple writes together
+  batch-writes: true
+  
+  # Cache size (number of entries)
+  cache-size: 1000
+  
+  # Cache TTL in seconds
+  cache-ttl-seconds: 300
+  
+  # Auto-save interval in ticks (20 ticks = 1 second)
+  auto-save-interval: 6000
+
+# Maintenance
+maintenance:
+  # Auto-cleanup old entries (0 = disabled)
+  auto-cleanup-days: 0
+  
+  # Defragment storage on startup
+  defragment-on-startup: false
+
