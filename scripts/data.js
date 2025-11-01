@@ -108,3 +108,10 @@ const reelsData = [
   { id: 2, video: "/assets/reel2.mp4" },
   { id: 3, video: "/assets/reel3.mp4" },
 ]
+
+// Reel data specifically for iPhone popup (popup 2)
+const reelsDataIphone = [
+  { id: 4, video: "/assets/reel4.mp4" },
+  { id: 5, video: "/assets/reel5.mp4" },
+  { id: 6, video: "/assets/reel6.mp4" },
+]

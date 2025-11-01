@@ -95,6 +95,69 @@ function setupReels() {
     observer.observe(reelItem)
   })
 
+  // Autoscroll functionality
+  let currentReelIndex = 0
+  let autoscrollTimeout = null
+  
+  const getRandomInterval = () => {
+    // Random interval between 3-7 seconds (mean ~5 seconds)
+    return Math.floor(Math.random() * 4000) + 3000
+  }
+  
+  const scrollToReel = (index) => {
+    if (index >= videos.length) {
+      index = 0 // Loop back to first reel
+    }
+    
+    const targetReel = videos[index].reelItem
+    targetReel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    currentReelIndex = index
+  }
+  
+  const scheduleNextScroll = () => {
+    const interval = getRandomInterval()
+    autoscrollTimeout = setTimeout(() => {
+      currentReelIndex = (currentReelIndex + 1) % videos.length
+      scrollToReel(currentReelIndex)
+      scheduleNextScroll() // Schedule the next scroll with a new random interval
+    }, interval)
+  }
+  
+  const startAutoscroll = () => {
+    scheduleNextScroll()
+  }
+  
+  const stopAutoscroll = () => {
+    clearTimeout(autoscrollTimeout)
+  }
+  
+  // Start autoscroll after a brief delay
+  setTimeout(() => {
+    startAutoscroll()
+  }, 1000)
+  
+  // Pause autoscroll when user interacts with the container
+  let userInteractionTimeout = null
+  reelsContainer.addEventListener('wheel', () => {
+    stopAutoscroll()
+    clearTimeout(userInteractionTimeout)
+    
+    // Resume autoscroll after 10 seconds of no interaction
+    userInteractionTimeout = setTimeout(() => {
+      startAutoscroll()
+    }, 10000)
+  })
+  
+  reelsContainer.addEventListener('touchstart', () => {
+    stopAutoscroll()
+    clearTimeout(userInteractionTimeout)
+    
+    // Resume autoscroll after 10 seconds of no interaction
+    userInteractionTimeout = setTimeout(() => {
+      startAutoscroll()
+    }, 10000)
+  })
+
   // Drag handle setup
   const dragHandle = reelsPopup.querySelector(".reels-header")
   if (!dragHandle) return
@@ -380,7 +443,7 @@ function setupReels2() {
 
   // Render reel list
   const videos = []
-  reelsData.forEach((reel) => {
+  reelsDataIphone.forEach((reel) => {
     const reelItem = document.createElement("div")
     reelItem.className = "reel-item"
     reelItem.innerHTML = `
