@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R2 API Test Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            font-size: 0.9em;
+        }
+
+        .status.connected {
+            background: #10b981;
+        }
+
+        .status.disconnected {
+            background: #ef4444;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .output {
+            background: #1e293b;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 15px;
+        }
+
+        .file-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 0.85em;
+            color: #64748b;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .file-actions button {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Cloudflare R2 API Test Dashboard</h1>
+            <div class="status" id="status">Checking connection...</div>
+        </div>
+
+        <div class="content">
+            <!-- Health Check Section -->
+            <div class="section">
+                <h2>🏥 Health Check</h2>
+                <p>Verify R2 connection status</p>
+                <div class="button-group">
+                    <button onclick="checkHealth()">Check R2 Connection</button>
+                </div>
+                <div class="output" id="health-output" style="display:none;"></div>
+            </div>
+
+            <!-- List Files Section -->
+            <div class="section">
+                <h2>📁 List Files</h2>
+                <div class="input-group">
+                    <label>Folder (optional):</label>
+                    <input type="text" id="list-folder" placeholder="e.g., lectures or reels">
+                </div>
+                <div class="button-group">
+                    <button onclick="listFiles()">List All Files</button>
+                    <button onclick="listFiles('lectures')">List Lectures</button>
+                    <button onclick="listFiles('reels')">List Reels</button>
+                </div>
+                <div class="file-list" id="file-list"></div>
+            </div>
+
+            <!-- File Info Section -->
+            <div class="section">
+                <h2>ℹ️ File Info</h2>
+                <div class="input-group">
+                    <label>Folder:</label>
+                    <input type="text" id="info-folder" placeholder="e.g., lectures">
+                </div>
+                <div class="input-group">
+                    <label>File Name:</label>
+                    <input type="text" id="info-filename" placeholder="e.g., DE Intro.mp4">
+                </div>
+                <div class="button-group">
+                    <button onclick="getFileInfo()">Get File Info</button>
+                </div>
+                <div class="output" id="info-output" style="display:none;"></div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="section">
+                <h2>⬆️ Upload File</h2>
+                <div class="input-group">
+                    <label>Folder (optional):</label>
+                    <input type="text" id="upload-folder" placeholder="e.g., test">
+                </div>
+                <div class="input-group">
+                    <label>Select File:</label>
+                    <input type="file" id="upload-file">
+                </div>
+                <div class="button-group">
+                    <button onclick="uploadFile()">Upload File</button>
+                </div>
+                <div class="output" id="upload-output" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        // Check health on load
+        window.addEventListener('load', checkHealth);
+
+        async function checkHealth() {
+            const output = document.getElementById('health-output');
+            const status = document.getElementById('status');
+            output.style.display = 'block';
+            output.textContent = 'Checking connection...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/r2-health`);
+                const data = await response.json();
+                
+                output.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.success) {
+                    status.textContent = '✓ Connected to R2';
+                    status.className = 'status connected';
+                } else {
+                    status.textContent = '✗ Connection Failed';
+                    status.className = 'status disconnected';
+                }
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+                status.textContent = '✗ Connection Error';
+                status.className = 'status disconnected';
+            }
+        }
+
+        async function listFiles(folder) {
+            const folderInput = document.getElementById('list-folder');
+            const targetFolder = folder || folderInput.value;
+            const fileList = document.getElementById('file-list');
+            
+            fileList.innerHTML = '<div class="loading"><div class="spinner"></div>Loading files...</div>';
+            
+            try {
+                const url = `${API_BASE}/list-files?folder=${encodeURIComponent(targetFolder)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success && data.files.length > 0) {
+                    fileList.innerHTML = '';
+                    data.files.forEach(file => {
+                        const sizeKB = (file.size / 1024).toFixed(2);
+                        const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+                        const sizeDisplay = file.size > 1024*1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
+                        
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        fileItem.innerHTML = `
+                            <div class="file-info">
+                                <div class="file-name">${file.key}</div>
+                                <div class="file-meta">Size: ${sizeDisplay} | Modified: ${new Date(file.lastModified).toLocaleString()}</div>
+                            </div>
+                            <div class="file-actions">
+                                <button onclick="viewFile('${file.key}')">View</button>
+                                <button onclick="getFileInfoByKey('${file.key}')">Info</button>
+                            </div>
+                        `;
+                        fileList.appendChild(fileItem);
+                    });
+                } else {
+                    fileList.innerHTML = '<div class="loading">No files found</div>';
+                }
+            } catch (error) {
+                fileList.innerHTML = `<div class="loading">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function getFileInfo() {
+            const folder = document.getElementById('info-folder').value;
+            const fileName = document.getElementById('info-filename').value;
+            const output = document.getElementById('info-output');
+            
+            if (!fileName) {
+                alert('Please enter a file name');
+                return;
+            }
+            
+            output.style.display = 'block';
+            output.textContent = 'Loading file info...';
+            
+            try {
+                const url = `${API_BASE}/file-info?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(fileName)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function getFileInfoByKey(key) {
+            const parts = key.split('/');
+            const fileName = parts.pop();
+            const folder = parts.join('/');
+            
+            document.getElementById('info-folder').value = folder;
+            document.getElementById('info-filename').value = fileName;
+            
+            await getFileInfo();
+            document.getElementById('info-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function viewFile(key) {
+            const parts = key.split('/');
+            const fileName = parts.pop();
+            const folder = parts.join('/');
+            
+            const url = `${API_BASE}/read-file?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(fileName)}`;
+            window.open(url, '_blank');
+        }
+
+        async function uploadFile() {
+            const folder = document.getElementById('upload-folder').value;
+            const fileInput = document.getElementById('upload-file');
+            const output = document.getElementById('upload-output');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a file to upload');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            output.style.display = 'block';
+            output.textContent = `Uploading ${file.name}...`;
+            
+            try {
+                const url = `${API_BASE}/upload-file?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(file.name)}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type || 'application/octet-stream'
+                    }
+                });
+                
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+                
+                if (data.success) {
+                    alert('File uploaded successfully!');
+                    listFiles(folder);
+                }
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+

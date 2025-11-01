@@ -1,16 +1,17 @@
-// Demo lecture data
+// Demo lecture data with R2 integration
 const lecturesData = [
   {
     id: 1,
-    title: "Introduction to Machine Learning",
-    module: "AI Fundamentals",
-    instructor: "Dr. Sarah Chen",
+    title: "Data Engineering Introduction",
+    module: "Data Engineering",
+    instructor: "Chris Rogers",
     duration: "45:32",
-    thumbnail: "/machine-learning-course.png",
-    description:
-      "Learn the fundamentals of machine learning including supervised and unsupervised learning techniques.",
+    thumbnail: "/lecture-1.jpg",
+    description: "Introduction to data engineering concepts and methodologies.",
     date: "Nov 15, 2024",
     section: "subscriptions",
+    folder: "lectures",
+    fileName: "DE Intro.mp4"
   },
   {
     id: 2,
@@ -102,9 +103,57 @@ const lecturesData = [
   },
 ]
 
-// Sample reel data for side panels
+// Sample reel data with R2 integration
 const reelsData = [
-  { id: 1, video: "/assets/reel1.mp4" },
-  { id: 2, video: "/assets/reel2.mp4" },
-  { id: 3, video: "/assets/reel3.mp4" },
+  { id: 1, video: "/read-file?folder=reels&fileName=AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4" },
+  { id: 2, video: "/read-file?folder=reels&fileName=AQOlVR7tzd9uy_zTqMHNTASjyZ1aH6xRpzUaP2SpTm6V7QcVaKRIWQcfxNCKZJh7SWwkfRTKRpwxnUryw03rT4A7eZLi6FDEydzDWpM.mp4" },
+  { id: 3, video: "/read-file?folder=reels&fileName=AQPAklItaWZZA9BfewkclZEZYiQW-FZ8KaRl7EhS8g68gnTykamEsA5P1SyomsubbB6a59coxc5TnfIyjw9a3kJyzIFIfq56r5UH9Fg.mp4" },
 ]
+
+// Function to load lectures dynamically from R2
+async function loadLecturesFromR2() {
+  try {
+    const response = await fetch('/list-files?folder=lectures');
+    const data = await response.json();
+    
+    if (data.success && data.files) {
+      // Filter only video files
+      const videoFiles = data.files.filter(file => 
+        file.key.endsWith('.mp4') || file.key.endsWith('.webm')
+      );
+      
+      // Add to lecturesData if not already present
+      videoFiles.forEach((file, index) => {
+        const fileName = file.key.split('/').pop();
+        const existingLecture = lecturesData.find(l => l.fileName === fileName);
+        
+        if (!existingLecture) {
+          lecturesData.push({
+            id: lecturesData.length + 1,
+            title: fileName.replace(/\.[^/.]+$/, ""), // Remove extension
+            module: "Uploaded Content",
+            instructor: "Unknown",
+            duration: "—",
+            thumbnail: "/lecture-1.jpg",
+            description: "Lecture from R2 storage",
+            date: new Date(file.lastModified).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric', 
+              year: 'numeric' 
+            }),
+            section: "whats-new",
+            folder: "lectures",
+            fileName: fileName
+          });
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error loading lectures from R2:', error);
+  }
+}
+
+// Load R2 lectures on page load
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', loadLecturesFromR2);
+}

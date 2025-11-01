@@ -1,0 +1,23 @@
+name: MinecraftDatabase
+version: ${project.version}
+main: com.brainrot.mcdb.MinecraftDBPlugin
+api-version: 1.20
+author: Brainrot Team
+description: Use Minecraft chunks as a database via block manipulation
+website: https://github.com/brainrot/minecraft-database
+
+commands:
+  mcdb:
+    description: Minecraft Database commands
+    usage: /<command> [reload|status|clear|test|info]
+    permission: mcdb.admin
+    permission-message: You don't have permission to use this command
+    
+permissions:
+  mcdb.admin:
+    description: Access to all MCDB commands
+    default: op
+  mcdb.bypass:
+    description: Bypass database chunk protection
+    default: op
+
