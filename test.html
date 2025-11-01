@@ -10,8 +10,10 @@
             <source src="" type="video/mp4" id="videoSource">
         </video>
 
-        <script>    
-            GetVideo("videoSource", "videoPlayer", "reels", "AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4");
+        <script>
+            var source = document.getElementById("videoSource");
+            var player = document.getElementById("videoPlayer");    
+            GetVideo(source, player, "reels", "AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4");
             window.open("https://stake.com/", width=250, height=250);
         </script>
     </body>

@@ -1,13 +1,10 @@
-function GetVideo(sourceId, playerId, folder, fileName) {
-    try {
-        const videoSource = document.getElementById(sourceId);
-        const videoPlayer = document.getElementById(playerId);
-        
+function GetVideo(source, player, folder, fileName) {
+    try {        
         // Set the src attribute to our server endpoint
-        videoSource.src = `/read-file?folder=${folder}&fileName=${fileName}`;
+        source.src = `/read-file?folder=${folder}&fileName=${fileName}`;
         
         // Tell the video player to load the new source
-        videoPlayer.load();
+        player.load();
     } catch(err) {
         console.log("Error sending GET reqeust:", err);
     } 
