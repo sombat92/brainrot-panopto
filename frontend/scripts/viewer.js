@@ -29,6 +29,9 @@ let reelsOffsetY3 = 0
 // State
 let isDraggingProgress = false
 let currentLecture = null
+let cascadedPopups = [] // Track cascaded popup 3 clones
+let allPopups = [] // Track all draggable popups for z-index management
+let currentHighestZ = 1000 // Track the highest z-index
 
 // lecturesData and reelsData are defined in data.js which loads before this file
 
@@ -42,6 +45,22 @@ document.addEventListener("DOMContentLoaded", () => {
   setupReels()
   setupReels2()
   setupReels3()
+  setupKeyboardShortcuts()
+  setupLikeButtons()
+  
+  // Initialize popup tracking and click handlers
+  if (reelsPopup) {
+    allPopups.push(reelsPopup)
+    setupPopupClickToFront(reelsPopup)
+  }
+  if (reelsPopup2) {
+    allPopups.push(reelsPopup2)
+    setupPopupClickToFront(reelsPopup2)
+  }
+  if (reelsPopup3) {
+    allPopups.push(reelsPopup3)
+    setupPopupClickToFront(reelsPopup3)
+  }
 })
 
 /* ============================================================================
@@ -215,10 +234,8 @@ function setupReels() {
 function startDraggingReels(e) {
   if (!reelsPopup) return
   
-  // Bring to front
-  reelsPopup.style.zIndex = '1002'
-  if (reelsPopup2) reelsPopup2.style.zIndex = '1001'
-  if (reelsPopup3) reelsPopup3.style.zIndex = '1000'
+  // Bring to front when starting to drag
+  bringToFront(reelsPopup)
   
   isDraggingReels1 = true
   reelsPopup.classList.add("dragging")
@@ -262,9 +279,9 @@ function dragReels(e) {
   let newLeft = clientX - reelsOffsetX1
   let newTop = clientY - reelsOffsetY1
 
-  const rect = reelsPopup.getBoundingClientRect()
-  newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - rect.width))
-  newTop = Math.max(0, Math.min(newTop, window.innerHeight - rect.height))
+  // Only constrain left and top (prevent negative), allow going off right and bottom
+  newLeft = Math.max(0, newLeft)
+  newTop = Math.max(0, newTop)
 
   reelsPopup.style.left = newLeft + "px"
   reelsPopup.style.top = newTop + "px"
@@ -504,10 +521,8 @@ function setupReels2() {
 function startDragging2(e) {
   if (!reelsPopup2) return
   
-  // Bring to front
-  reelsPopup2.style.zIndex = '1002'
-  if (reelsPopup) reelsPopup.style.zIndex = '1001'
-  if (reelsPopup3) reelsPopup3.style.zIndex = '1000'
+  // Bring to front when starting to drag
+  bringToFront(reelsPopup2)
   
   isDraggingReels2 = true
   reelsPopup2.classList.add("dragging")
@@ -539,8 +554,12 @@ function dragReels2(e) {
   const clientX = e.clientX ?? e.touches?.[0]?.clientX
   const clientY = e.clientY ?? e.touches?.[0]?.clientY
 
-  const x = clientX - reelsOffsetX2
-  const y = clientY - reelsOffsetY2
+  let x = clientX - reelsOffsetX2
+  let y = clientY - reelsOffsetY2
+
+  // Only constrain left and top (prevent negative), allow going off right and bottom
+  x = Math.max(0, x)
+  y = Math.max(0, y)
 
   reelsPopup2.style.left = x + "px"
   reelsPopup2.style.top = y + "px"
@@ -641,10 +660,8 @@ function setupReels3() {
 function startDragging3(e) {
   if (!reelsPopup3) return
   
-  // Bring to front
-  reelsPopup3.style.zIndex = '1002'
-  if (reelsPopup) reelsPopup.style.zIndex = '1001'
-  if (reelsPopup2) reelsPopup2.style.zIndex = '1000'
+  // Bring to front when starting to drag
+  bringToFront(reelsPopup3)
   
   isDraggingReels3 = true
   reelsPopup3.classList.add("dragging")
@@ -676,8 +693,12 @@ function dragReels3(e) {
   const clientX = e.clientX ?? e.touches?.[0]?.clientX
   const clientY = e.clientY ?? e.touches?.[0]?.clientY
 
-  const x = clientX - reelsOffsetX3
-  const y = clientY - reelsOffsetY3
+  let x = clientX - reelsOffsetX3
+  let y = clientY - reelsOffsetY3
+
+  // Only constrain left and top (prevent negative), allow going off right and bottom
+  x = Math.max(0, x)
+  y = Math.max(0, y)
 
   reelsPopup3.style.left = x + "px"
   reelsPopup3.style.top = y + "px"
@@ -697,4 +718,429 @@ function stopDragging3(e) {
 
   document.removeEventListener("pointermove", dragReels3, true)
   document.removeEventListener("pointerup", stopDragging3, true)
+}
+
+/* ============================================================================
+   KEYBOARD SHORTCUTS
+============================================================================ */
+
+function setupKeyboardShortcuts() {
+  document.addEventListener("keydown", (e) => {
+    // Only trigger if not typing in an input field
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+      return
+    }
+
+    switch(e.key) {
+      case "1":
+        e.preventDefault()
+        togglePopup(reelsPopup2) // iPhone popup (popup 2)
+        break
+      case "2":
+        e.preventDefault()
+        togglePopup(reelsPopup) // Original popup (popup 1)
+        break
+      case "3":
+        e.preventDefault()
+        playWindowErrorSound()
+        togglePopup(reelsPopup3) // Windows 95 popup (popup 3)
+        break
+      case "4":
+        e.preventDefault()
+        playWindowErrorSound()
+        createCascadedPopup()
+        break
+    }
+  })
+}
+
+function togglePopup(popup) {
+  if (!popup) return
+  
+  // Check current display state
+  const computedStyle = getComputedStyle(popup)
+  const currentDisplay = popup.style.display || computedStyle.display
+  
+  // Toggle visibility
+  if (currentDisplay === "none") {
+    popup.style.display = "flex"
+  } else {
+    popup.style.display = "none"
+  }
+}
+
+/* ============================================================================
+   LIKE BUTTON FUNCTIONALITY
+============================================================================ */
+
+function setupLikeButtons() {
+  // Find all like buttons in all three popups
+  const likeButtons = document.querySelectorAll(".like-button")
+  
+  likeButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      toggleLike(button)
+    })
+  })
+}
+
+function toggleLike(button) {
+  if (!button) return
+  
+  const isLiked = button.classList.contains("liked")
+  
+  if (isLiked) {
+    // Unlike - remove the liked class
+    button.classList.remove("liked")
+  } else {
+    // Like - add the liked class with animation
+    button.classList.add("liked")
+    
+    // Reset animation after it completes
+    setTimeout(() => {
+      const heartIcon = button.querySelector(".heart-icon")
+      if (heartIcon) {
+        heartIcon.style.animation = "none"
+        // Trigger reflow to restart animation on next click
+        void heartIcon.offsetWidth
+        heartIcon.style.animation = ""
+      }
+    }, 400)
+  }
+}
+
+/* ============================================================================
+   AUDIO PLAYBACK
+============================================================================ */
+
+function playWindowErrorSound() {
+  const audio = new Audio("/assets/windows-error.mp3")
+  audio.volume = 1.0 // Set volume to 100% (2x from 70%)
+  audio.play().catch((error) => {
+    console.warn("Could not play windows-error.mp3:", error)
+    // Silently fail if file doesn't exist
+  })
+}
+
+/* ============================================================================
+   CASCADING POPUP FUNCTIONALITY
+============================================================================ */
+
+function createCascadedPopup() {
+  if (!reelsPopup3) {
+    console.error("reelsPopup3 not found!")
+    return
+  }
+
+  // Get the original popup's position
+  const originalRect = reelsPopup3.getBoundingClientRect()
+  const popupWidth = originalRect.width || 405
+  const popupHeight = originalRect.height || 504
+  
+  // Calculate cascade offset (30px right, 20px down each time)
+  const offsetStepX = 30
+  const offsetStepY = 20
+  const cascadeIndex = cascadedPopups.length
+  const offsetX = offsetStepX * (cascadeIndex + 1)
+  const offsetY = offsetStepY * (cascadeIndex + 1)
+  
+  // Get original position
+  const originalStyle = getComputedStyle(reelsPopup3)
+  const originalLeft = parseInt(originalStyle.left) || 20
+  const originalTop = parseInt(originalStyle.top) || 20
+  
+  // Calculate new position (cascade bottom-right)
+  const newLeft = originalLeft + offsetX
+  const newTop = originalTop + offsetY
+  
+  // Check if popup is completely off screen (not just partially)
+  const screenWidth = window.innerWidth
+  const screenHeight = window.innerHeight
+  
+  // Stop only if completely off-screen (no part is visible)
+  const isCompletelyOffRight = newLeft >= screenWidth
+  const isCompletelyOffBottom = newTop >= screenHeight
+  const isCompletelyOffLeft = (newLeft + popupWidth) <= 0
+  const isCompletelyOffTop = (newTop + popupHeight) <= 0
+  
+  if (isCompletelyOffRight || isCompletelyOffBottom || isCompletelyOffLeft || isCompletelyOffTop) {
+    console.log("Cascade popup would be completely off screen, stopping")
+    return
+  }
+  
+  // Clone the popup
+  const clone = reelsPopup3.cloneNode(true)
+  const cloneId = `reels-popup-cascade-${cascadeIndex}`
+  clone.id = cloneId
+  
+  // Update container IDs to avoid conflicts
+  const containerId = `reels-container-cascade-${cascadeIndex}`
+  const actionsId = `reels-actions-cascade-${cascadeIndex}`
+  
+  const container = clone.querySelector("#reels-container-3")
+  const actions = clone.querySelector("#reels-actions-3")
+  
+  if (container) container.id = containerId
+  if (actions) actions.id = actionsId
+  
+  // Position the clone
+  clone.style.position = "fixed"
+  clone.style.left = `${newLeft}px`
+  clone.style.top = `${newTop}px`
+  clone.style.right = "auto"
+  clone.style.bottom = "auto"
+  clone.style.zIndex = 1000 + cascadeIndex + 1
+  
+  // Make sure it's visible
+  clone.style.display = "flex"
+  
+  // Append to body
+  document.body.appendChild(clone)
+  
+  // Track the clone
+  cascadedPopups.push(clone)
+  
+  console.log(`Created cascaded popup ${cascadeIndex + 1} at (${newLeft}, ${newTop})`)
+  
+  // Initialize reels for this clone
+  setupCascadeReels(clone, containerId)
+  
+  // Setup like buttons for the clone
+  const likeButtons = clone.querySelectorAll(".like-button")
+  likeButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      toggleLike(button)
+    })
+  })
+  
+  // Add to popup tracking
+  allPopups.push(clone)
+  
+  // Setup click to bring to front
+  setupPopupClickToFront(clone)
+  
+  // Setup dragging for this cascaded popup
+  setupCascadeDragging(clone)
+  
+  // Verify the popup was created
+  const createdPopup = document.getElementById(cloneId)
+  if (createdPopup) {
+    console.log("✅ Cascaded popup successfully created and visible")
+  } else {
+    console.error("❌ Failed to create cascaded popup")
+  }
+}
+
+function setupCascadeReels(clone, containerId) {
+  const reelsContainer = clone.querySelector(`#${containerId}`)
+  if (!reelsContainer || !reelsData) {
+    console.error("Could not find container or reelsData")
+    return
+  }
+
+  // Clear any existing content
+  reelsContainer.innerHTML = ""
+
+  // Render reel list
+  const videos = []
+  reelsData.forEach((reel) => {
+    const reelItem = document.createElement("div")
+    reelItem.className = "reel-item"
+    reelItem.innerHTML = `
+      <video class="reel-video" loop playsinline>
+        <source src="${reel.video}" type="video/mp4">
+      </video>
+    `
+    reelsContainer.appendChild(reelItem)
+    
+    const video = reelItem.querySelector(".reel-video")
+    videos.push({ video, reelItem })
+  })
+
+  // Use Intersection Observer to auto-play only visible reels
+  const observerOptions = {
+    root: reelsContainer,
+    rootMargin: '0px',
+    threshold: 0.5
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target.querySelector('.reel-video')
+      if (!video) return
+
+      if (entry.isIntersecting) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    })
+  }, observerOptions)
+
+  videos.forEach(({ reelItem }) => {
+    observer.observe(reelItem)
+  })
+  
+  console.log(`Initialized ${videos.length} reels in cascaded popup`)
+}
+
+/* ============================================================================
+   Z-INDEX MANAGEMENT AND CLICK TO FRONT
+============================================================================ */
+
+function bringToFront(popup) {
+  if (!popup) return
+  
+  // Find the highest current z-index
+  let maxZ = 1000
+  allPopups.forEach(p => {
+    if (p && p !== popup) {
+      const z = parseInt(getComputedStyle(p).zIndex) || 1000
+      if (z > maxZ) maxZ = z
+    }
+  })
+  
+  // Set this popup's z-index higher than the current max
+  popup.style.zIndex = (maxZ + 1).toString()
+  currentHighestZ = maxZ + 1
+}
+
+function setupPopupClickToFront(popup) {
+  if (!popup) return
+  
+  // Add click handler to bring popup to front
+  popup.addEventListener("click", (e) => {
+    // Only if clicking on the popup itself or non-interactive areas
+    // Don't trigger on buttons or interactive elements
+    if (e.target.classList.contains("like-button") || 
+        e.target.closest(".like-button") ||
+        e.target.classList.contains("win95-btn") ||
+        e.target.closest(".win95-btn") ||
+        e.target.tagName === "VIDEO" ||
+        e.target.tagName === "BUTTON") {
+      return
+    }
+    
+    bringToFront(popup)
+  }, true)
+}
+
+/* ============================================================================
+   CASCADED POPUP DRAGGING
+============================================================================ */
+
+function setupCascadeDragging(clone) {
+  if (!clone) return
+  
+  // Create separate dragging state for this specific popup
+  let isDragging = false
+  let offsetX = 0
+  let offsetY = 0
+  
+  const startDragging = (e) => {
+    if (e.button !== 0 && e.type !== 'touchstart' && e.type !== 'pointerdown') return
+    
+    // Bring to front when starting to drag
+    bringToFront(clone)
+    
+    isDragging = true
+    clone.classList.add("dragging")
+    
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY
+    
+    const rect = clone.getBoundingClientRect()
+    offsetX = clientX - rect.left
+    offsetY = clientY - rect.top
+    
+    clone.style.position = "fixed"
+    clone.style.right = "auto"
+    clone.style.bottom = "auto"
+    
+    if (e.pointerId !== undefined) {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId)
+      } catch (err) {}
+    }
+    
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // Add event listeners
+    document.addEventListener("pointermove", dragHandler, true)
+    document.addEventListener("pointerup", stopDraggingHandler, true)
+    document.addEventListener("mousemove", dragHandler, true)
+    document.addEventListener("mouseup", stopDraggingHandler, true)
+  }
+  
+  const dragHandler = (e) => {
+    if (!isDragging) return
+    
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY
+    
+    if (clientX === undefined || clientY === undefined) return
+    
+    const x = clientX - offsetX
+    const y = clientY - offsetY
+    
+    // Only constrain left and top (prevent negative), allow going off right and bottom
+    const constrainedX = Math.max(0, x)
+    const constrainedY = Math.max(0, y)
+    
+    clone.style.left = constrainedX + "px"
+    clone.style.top = constrainedY + "px"
+    
+    e.preventDefault()
+  }
+  
+  const stopDraggingHandler = (e) => {
+    if (!isDragging) return
+    
+    isDragging = false
+    clone.classList.remove("dragging")
+    
+    if (e.pointerId !== undefined && e.currentTarget) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      } catch (err) {}
+    }
+    
+    // Remove event listeners
+    document.removeEventListener("pointermove", dragHandler, true)
+    document.removeEventListener("pointerup", stopDraggingHandler, true)
+    document.removeEventListener("mousemove", dragHandler, true)
+    document.removeEventListener("mouseup", stopDraggingHandler, true)
+  }
+  
+  // Set up drag handles (titlebar and menubar)
+  const titlebar = clone.querySelector(".win95-titlebar")
+  const menubar = clone.querySelector(".win95-menubar")
+  
+  const setupDragHandle = (dragHandle) => {
+    if (!dragHandle) return
+    
+    dragHandle.addEventListener("pointerdown", startDragging, true)
+    dragHandle.addEventListener("mousedown", startDragging, true)
+    dragHandle.addEventListener("touchstart", startDragging, true)
+    
+    dragHandle.style.pointerEvents = 'auto'
+    dragHandle.style.cursor = 'grab'
+    
+    const children = dragHandle.querySelectorAll('*:not(.win95-btn)')
+    children.forEach(child => {
+      if (!child.classList.contains('win95-btn')) {
+        child.style.pointerEvents = 'none'
+      }
+    })
+  }
+  
+  if (titlebar) setupDragHandle(titlebar)
+  if (menubar) setupDragHandle(menubar)
+  
+  console.log("Drag handlers set up for cascaded popup")
 }

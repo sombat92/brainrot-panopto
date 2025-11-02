@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   filteredLectures = lecturesData
   renderLectures()
   setupEventListeners()
+  setupThumbnailClickHandlers()
 })
 
 // Setup event listeners
@@ -82,9 +83,7 @@ function renderLectures() {
   const sharedLectures = lecturesData.filter((l) => l.section === "shared")
   renderSection("shared-grid", sharedLectures)
 
-  // Render what's new
-  const newLectures = lecturesData.filter((l) => l.section === "whats-new")
-  renderSection("whats-new-grid", newLectures)
+  // What's new section is populated directly in HTML, skip rendering
 }
 
 // Render a specific section
@@ -112,4 +111,39 @@ function renderSection(gridId, lectures) {
 function goToViewer(lecture) {
   sessionStorage.setItem("currentLecture", JSON.stringify(lecture))
   window.location.href = "/viewer.html"
+}
+
+// Setup thumbnail click handlers
+function setupThumbnailClickHandlers() {
+  // Use a small delay to ensure DOM is fully ready
+  setTimeout(() => {
+    const thumbnailItems = document.querySelectorAll("#whats-new-grid .thumbnail-item")
+    
+    console.log("Found thumbnail items:", thumbnailItems.length)
+    
+    thumbnailItems.forEach((item, index) => {
+      // tn5 is the 5th thumbnail (index 4, since arrays are 0-indexed)
+      if (index === 4) {
+        // Add click handler to both the container and the image
+        const clickHandler = (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          console.log("tn5 clicked, navigating to viewer")
+          window.location.href = "/viewer.html"
+          return false
+        }
+        
+        item.addEventListener("click", clickHandler)
+        
+        // Also add to the image inside
+        const img = item.querySelector("img")
+        if (img) {
+          img.style.cursor = "pointer"
+          img.addEventListener("click", clickHandler)
+        }
+        
+        console.log("Click handler added to thumbnail", index + 1)
+      }
+    })
+  }, 100)
 }

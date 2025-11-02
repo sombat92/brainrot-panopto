@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lecture Viewer - Academic Portal</title>
+  <title>Lecture Viewer - brainrot labs</title>
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/lecture-selection.css">
 </head>
@@ -16,7 +16,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
           </svg>
-          <span class="app-title">Academic Portal</span>
+          <span class="app-title">brainrot labs</span>
         </div>
       </div>
       
@@ -110,8 +110,27 @@
           <h2 class="section-title">What's New</h2>
           <a href="#" class="section-link">View all</a>
         </div>
-        <div class="lectures-grid" id="whats-new-grid">
-          <!-- Populated by JS -->
+        <div class="thumbnail-scroll-container">
+          <div class="thumbnail-scroll" id="whats-new-grid">
+            <div class="thumbnail-item">
+              <img src="/assets/tn1.jpeg" alt="Thumbnail 1" class="thumbnail-img-16x9">
+            </div>
+            <div class="thumbnail-item">
+              <img src="/assets/tn2.jpeg" alt="Thumbnail 2" class="thumbnail-img-16x9">
+            </div>
+            <div class="thumbnail-item">
+              <img src="/assets/tn3.jpeg" alt="Thumbnail 3" class="thumbnail-img-16x9">
+            </div>
+            <div class="thumbnail-item">
+              <img src="/assets/tn4.jpeg" alt="Thumbnail 4" class="thumbnail-img-16x9">
+            </div>
+            <div class="thumbnail-item" onclick="window.location.href='/viewer.html'" style="cursor: pointer;">
+              <img src="/assets/tn5.jpeg" alt="Thumbnail 5" class="thumbnail-img-16x9" style="pointer-events: none;">
+            </div>
+            <div class="thumbnail-item">
+              <img src="/assets/tn6.jpeg" alt="Thumbnail 6" class="thumbnail-img-16x9">
+            </div>
+          </div>
         </div>
       </section>
     </main>
