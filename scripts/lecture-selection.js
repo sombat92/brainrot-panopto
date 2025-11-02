@@ -82,9 +82,7 @@ function renderLectures() {
   const sharedLectures = lecturesData.filter((l) => l.section === "shared")
   renderSection("shared-grid", sharedLectures)
 
-  // Render what's new
-  const newLectures = lecturesData.filter((l) => l.section === "whats-new")
-  renderSection("whats-new-grid", newLectures)
+  // What's new section is populated directly in HTML, skip rendering
 }
 
 // Render a specific section
