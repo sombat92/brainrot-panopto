@@ -12,7 +12,7 @@ app.use(express.json());
 const MINECRAFT_HOST = process.env.MINECRAFT_HOST || 'localhost';
 const MINECRAFT_PORT = parseInt(process.env.MINECRAFT_PORT) || 25566;
 const MINECRAFT_TOKEN = process.env.MINECRAFT_AUTH_TOKEN || 'change-me-in-production-please';
-const BRIDGE_PORT = parseInt(process.env.BRIDGE_PORT) || 3001;
+const BRIDGE_PORT = parseInt(process.env.BRIDGE_PORT) || 3002;
 
 // Connection pool
 class MinecraftConnection {
@@ -230,25 +230,267 @@ app.get('/mcdb/stats', async (req, res) => {
   }
 });
 
+// ============================================
+// VERTICAL DATABASE REGIONS - R2 Sync
+// ============================================
+
+// Sync R2 reels to Minecraft (Region: Y 5-100)
+app.post('/mcdb/reels/sync', async (req, res) => {
+  try {
+    const { r2BaseUrl, r2Files } = req.body;
+    
+    if (!r2Files || !Array.isArray(r2Files)) {
+      return res.status(400).json({ error: 'r2Files array required' });
+    }
+    
+    const results = {
+      success: [],
+      failed: [],
+      total: r2Files.length
+    };
+    
+    for (const file of r2Files) {
+      const reelId = `reel:${file.key}`;
+      const metadata = {
+        id: reelId,
+        r2_key: file.key,
+        folder: 'reels',
+        filename: file.key.split('/').pop(),
+        size: file.size || 0,
+        uploaded_at: file.lastModified || new Date().toISOString(),
+        etag: file.etag || '',
+        duration: 0,
+        views: 0,
+        likes: 0
+      };
+      
+      try {
+        const encodedValue = Buffer.from(JSON.stringify(metadata)).toString('base64');
+        await minecraft.sendCommand('WRITE', { key: reelId, value: encodedValue });
+        results.success.push(reelId);
+      } catch (err) {
+        results.failed.push({ id: reelId, error: err.message });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `Synced ${results.success.length}/${results.total} reels`,
+      results
+    });
+  } catch (error) {
+    console.error('Reel sync error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Sync R2 lectures to Minecraft (Region: Y 105-200)
+app.post('/mcdb/lectures/sync', async (req, res) => {
+  try {
+    const { r2Files, lecturesData } = req.body;
+    
+    if (!r2Files || !Array.isArray(r2Files)) {
+      return res.status(400).json({ error: 'r2Files array required' });
+    }
+    
+    const results = {
+      success: [],
+      failed: [],
+      total: r2Files.length
+    };
+    
+    for (const file of r2Files) {
+      const filename = file.key.split('/').pop();
+      const lectureId = `lecture:${filename.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      
+      // Try to match with lecturesData if provided
+      let additionalData = {};
+      if (lecturesData) {
+        const match = lecturesData.find(l => l.fileName === filename);
+        if (match) {
+          additionalData = {
+            title: match.title,
+            module: match.module,
+            instructor: match.instructor,
+            duration: match.duration,
+            thumbnail: match.thumbnail,
+            description: match.description
+          };
+        }
+      }
+      
+      const metadata = {
+        id: lectureId,
+        r2_key: file.key,
+        folder: 'lectures',
+        filename: filename,
+        size: file.size || 0,
+        uploaded_at: file.lastModified || new Date().toISOString(),
+        etag: file.etag || '',
+        ...additionalData
+      };
+      
+      try {
+        const encodedValue = Buffer.from(JSON.stringify(metadata)).toString('base64');
+        await minecraft.sendCommand('WRITE', { key: lectureId, value: encodedValue });
+        results.success.push(lectureId);
+      } catch (err) {
+        results.failed.push({ id: lectureId, error: err.message });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `Synced ${results.success.length}/${results.total} lectures`,
+      results
+    });
+  } catch (error) {
+    console.error('Lecture sync error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// List all reels from Minecraft
+app.get('/mcdb/reels/list', async (req, res) => {
+  try {
+    const response = await minecraft.sendCommand('LIST', {});
+    
+    if (response.success && response.data && response.data.keys) {
+      const reelKeys = response.data.keys.filter(key => key.startsWith('reel:'));
+      
+      // Fetch metadata for each reel
+      const reels = [];
+      for (const key of reelKeys) {
+        try {
+          const data = await minecraft.sendCommand('READ', { key });
+          if (data.success && data.data.value) {
+            const metadata = JSON.parse(Buffer.from(data.data.value, 'base64').toString('utf8'));
+            reels.push(metadata);
+          }
+        } catch (err) {
+          console.error(`Error reading reel ${key}:`, err.message);
+        }
+      }
+      
+      res.json({
+        success: true,
+        count: reels.length,
+        reels
+      });
+    } else {
+      res.json({ success: true, count: 0, reels: [] });
+    }
+  } catch (error) {
+    console.error('Reel list error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// List all lectures from Minecraft
+app.get('/mcdb/lectures/list', async (req, res) => {
+  try {
+    const response = await minecraft.sendCommand('LIST', {});
+    
+    if (response.success && response.data && response.data.keys) {
+      const lectureKeys = response.data.keys.filter(key => key.startsWith('lecture:'));
+      
+      // Fetch metadata for each lecture
+      const lectures = [];
+      for (const key of lectureKeys) {
+        try {
+          const data = await minecraft.sendCommand('READ', { key });
+          if (data.success && data.data.value) {
+            const metadata = JSON.parse(Buffer.from(data.data.value, 'base64').toString('utf8'));
+            lectures.push(metadata);
+          }
+        } catch (err) {
+          console.error(`Error reading lecture ${key}:`, err.message);
+        }
+      }
+      
+      res.json({
+        success: true,
+        count: lectures.length,
+        lectures
+      });
+    } else {
+      res.json({ success: true, count: 0, lectures: [] });
+    }
+  } catch (error) {
+    console.error('Lecture list error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get specific reel by ID
+app.get('/mcdb/reels/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const key = id.startsWith('reel:') ? id : `reel:${id}`;
+    
+    const response = await minecraft.sendCommand('READ', { key });
+    
+    if (response.data && response.data.value) {
+      response.data.value = JSON.parse(Buffer.from(response.data.value, 'base64').toString('utf8'));
+    }
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Get reel error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get specific lecture by ID
+app.get('/mcdb/lectures/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const key = id.startsWith('lecture:') ? id : `lecture:${id}`;
+    
+    const response = await minecraft.sendCommand('READ', { key });
+    
+    if (response.data && response.data.value) {
+      response.data.value = JSON.parse(Buffer.from(response.data.value, 'base64').toString('utf8'));
+    }
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Get lecture error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start server
 minecraft.connect()
   .then(() => {
     app.listen(BRIDGE_PORT, () => {
-      console.log('╔════════════════════════════════════════════╗');
-      console.log('║   Minecraft Database Bridge Server        ║');
-      console.log('╠════════════════════════════════════════════╣');
-      console.log(`║   HTTP Server: http://localhost:${BRIDGE_PORT}    ║`);
-      console.log(`║   Minecraft: ${MINECRAFT_HOST}:${MINECRAFT_PORT}             ║`);
-      console.log('╠════════════════════════════════════════════╣');
-      console.log('║   Endpoints:                               ║');
-      console.log('║   POST   /mcdb/write                       ║');
-      console.log('║   GET    /mcdb/read/:key                   ║');
-      console.log('║   DELETE /mcdb/delete/:key                 ║');
-      console.log('║   GET    /mcdb/list                        ║');
-      console.log('║   GET    /mcdb/exists/:key                 ║');
-      console.log('║   GET    /mcdb/stats                       ║');
-      console.log('║   GET    /health                           ║');
-      console.log('╚════════════════════════════════════════════╝');
+      console.log('╔══════════════════════════════════════════════╗');
+      console.log('║   Minecraft Database Bridge Server          ║');
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log(`║   HTTP Server: http://localhost:${BRIDGE_PORT}      ║`);
+      console.log(`║   Minecraft: ${MINECRAFT_HOST}:${MINECRAFT_PORT}               ║`);
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log('║   📚 Database Regions (Vertical):            ║');
+      console.log('║      Reels:    Y 5-100   (reel:* keys)      ║');
+      console.log('║      Lectures: Y 105-200 (lecture:* keys)   ║');
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log('║   Core Endpoints:                            ║');
+      console.log('║   POST   /mcdb/write                         ║');
+      console.log('║   GET    /mcdb/read/:key                     ║');
+      console.log('║   DELETE /mcdb/delete/:key                   ║');
+      console.log('║   GET    /mcdb/list                          ║');
+      console.log('║   GET    /mcdb/stats                         ║');
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log('║   🎬 Reel Endpoints:                         ║');
+      console.log('║   POST   /mcdb/reels/sync                    ║');
+      console.log('║   GET    /mcdb/reels/list                    ║');
+      console.log('║   GET    /mcdb/reels/:id                     ║');
+      console.log('╠══════════════════════════════════════════════╣');
+      console.log('║   🎓 Lecture Endpoints:                      ║');
+      console.log('║   POST   /mcdb/lectures/sync                 ║');
+      console.log('║   GET    /mcdb/lectures/list                 ║');
+      console.log('║   GET    /mcdb/lectures/:id                  ║');
+      console.log('╚══════════════════════════════════════════════╝');
     });
   })
   .catch(err => {
