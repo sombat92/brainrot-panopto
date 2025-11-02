@@ -12,7 +12,7 @@
   overflow: hidden;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 12px 24px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  display: flex;
+  display: none;
   flex-direction: column;
   cursor: move;
   user-select: none;
@@ -24,11 +24,12 @@
 }
 
 .reels-popup.active {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-  pointer-events: auto;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: scale(1) !important;
+  pointer-events: auto !important;
   animation: reelsPopIn 0.3s ease forwards;
+  display: flex !important;
 }
 
 @keyframes reelsPopIn {

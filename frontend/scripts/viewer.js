@@ -23,14 +23,28 @@ let cascadedPopups = [] // Track cascaded popup 3 clones
 let allPopups = [] // Track all draggable popups for z-index management
 let currentHighestZ = 1000 // Track the highest z-index
 
-// lecturesData and reelsData - will be loaded from API
-let reelsData = []
-let reelsDataIphone = []
+// lecturesData and reelsData are defined in data.js which loads before this file
 
 // Initialize
-document.addEventListener("DOMContentLoaded", async () => {
-  // Load reels from Minecraft database first
-  await loadReelsFromAPI()
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize DOM element references
+  video = document.getElementById("lecture-video")
+  playPauseBtn = document.getElementById("playPauseBtn")
+  skipBackBtn = document.getElementById("skipBackBtn")
+  skipForwardBtn = document.getElementById("skipForwardBtn")
+  muteBtn = document.getElementById("muteBtn")
+  progressBar = document.getElementById("progressBar")
+  if (progressBar) {
+    progressFill = progressBar.querySelector(".progress-fill")
+    progressHandle = progressBar.querySelector(".progress-handle")
+  }
+  timeDisplay = document.getElementById("timeDisplay")
+  
+  reelsPopup = document.getElementById("reels-popup")
+  reelsPopup2 = document.getElementById("reels-popup-2")
+  reelsPopup3 = document.getElementById("reels-popup-3")
+  
+  console.log("DOM Elements loaded - reelsPopup:", reelsPopup, "reelsPopup2:", reelsPopup2, "reelsPopup3:", reelsPopup3)
   
   loadLecture()
   setupVideoListeners()
@@ -74,47 +88,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupPopupClickToFront(reelsPopup3)
   }
 })
-
-/* ============================================================================
-   LOAD REELS FROM API
-============================================================================ */
-async function loadReelsFromAPI() {
-  try {
-    const response = await fetch('http://localhost:3002/mcdb/reels/list')
-    const data = await response.json()
-    
-    if (data.success && data.reels && data.reels.length > 0) {
-      // Transform API data to frontend format
-      reelsData = data.reels.map(reel => ({
-        video: `http://localhost:3001/get-file?key=${encodeURIComponent(reel.r2_key)}`,
-        username: reel.username || 'anonymous',
-        description: reel.description || 'No description',
-        likes: reel.likes || 0,
-        views: reel.views || 0,
-        avatar: `https://i.pravatar.cc/150?u=${reel.username}`
-      }))
-      
-      // Copy to iPhone data
-      reelsDataIphone = [...reelsData]
-      
-      console.log(`✅ Loaded ${reelsData.length} reels from Minecraft database`)
-    } else {
-      console.warn('⚠️ No reels found in database, using fallback data')
-      // Fallback to static data if available
-      if (typeof window.reelsData !== 'undefined') {
-        reelsData = window.reelsData
-        reelsDataIphone = window.reelsDataIphone || reelsData
-      }
-    }
-  } catch (error) {
-    console.error('❌ Error loading reels:', error)
-    // Fallback to static data if available
-    if (typeof window.reelsData !== 'undefined') {
-      reelsData = window.reelsData
-      reelsDataIphone = window.reelsDataIphone || reelsData
-    }
-  }
-}
 
 /* ============================================================================
    ✅ FIXED DRAGGABLE POPUP — pointer events only
@@ -334,6 +307,7 @@ function startDraggingReels(e) {
       // Silently fail
     }
   }
+
   e.preventDefault()
   e.stopPropagation()
 }
@@ -378,7 +352,6 @@ function stopDraggingReels(e) {
 
 function loadLecture() {
   const lectureData = sessionStorage.getItem("currentLecture")
-
   if (lectureData) {
     currentLecture = JSON.parse(lectureData)
   } else {
@@ -527,6 +500,7 @@ function loadNotesFromStorage() {
 /* ============================================================================
    iPhone Popup (Popup 2) Setup
 ============================================================================ */
+
 function setupReels2() {
   const reelsContainer = document.getElementById("reels-container-2")
   if (!reelsPopup2 || !reelsContainer) return
@@ -657,6 +631,7 @@ function stopDragging2(e) {
 /* ============================================================================
    Windows 95 Popup (Popup 3) Setup
 ============================================================================ */
+
 function setupReels3() {
   const reelsContainer = document.getElementById("reels-container-3")
   if (!reelsPopup3 || !reelsContainer) return
