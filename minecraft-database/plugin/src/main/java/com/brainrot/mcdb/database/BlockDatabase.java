@@ -341,8 +341,11 @@ public class BlockDatabase {
     }
     
     private boolean isSpaceAvailable(BlockPosition start, int count) {
+        BlockPosition pos = start;
+        BlockPosition end = chunkManager.getEndPosition();
+        int width = end.getX() - chunkManager.getStartPosition().getX() + 1;
+        
         for (int i = 0; i < count; i++) {
-            BlockPosition pos = start.offset(i, 0, 0);
             if (!chunkManager.isInDatabaseArea(pos)) {
                 return false;
             }
@@ -350,33 +353,81 @@ public class BlockDatabase {
             if (block.getType() != Material.AIR) {
                 return false;
             }
+            
+            // Move to next block (wrap to next row if needed)
+            pos = pos.offset(1, 0, 0);
+            if (pos.getX() > end.getX()) {
+                pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY(), pos.getZ() + 1);
+            }
+            if (pos.getZ() > end.getZ()) {
+                pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY() + 1, chunkManager.getStartPosition().getZ());
+            }
         }
         return true;
     }
     
     private void writeBlocks(BlockPosition start, List<Material> materials) {
+        BlockPosition pos = start;
+        BlockPosition end = chunkManager.getEndPosition();
+        
         for (int i = 0; i < materials.size(); i++) {
-            BlockPosition pos = start.offset(i, 0, 0);
             Block block = chunkManager.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
             block.setType(materials.get(i));
+            
+            // Move to next block (wrap to next row if needed)
+            if (i < materials.size() - 1) {  // Don't advance after last block
+                pos = pos.offset(1, 0, 0);
+                if (pos.getX() > end.getX()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY(), pos.getZ() + 1);
+                }
+                if (pos.getZ() > end.getZ()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY() + 1, chunkManager.getStartPosition().getZ());
+                }
+            }
         }
     }
     
     private List<Material> readBlocks(BlockPosition start, int count) {
         List<Material> materials = new ArrayList<>();
+        BlockPosition pos = start;
+        BlockPosition end = chunkManager.getEndPosition();
+        
         for (int i = 0; i < count; i++) {
-            BlockPosition pos = start.offset(i, 0, 0);
             Block block = chunkManager.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
             materials.add(block.getType());
+            
+            // Move to next block (wrap to next row if needed)
+            if (i < count - 1) {  // Don't advance after last block
+                pos = pos.offset(1, 0, 0);
+                if (pos.getX() > end.getX()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY(), pos.getZ() + 1);
+                }
+                if (pos.getZ() > end.getZ()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY() + 1, chunkManager.getStartPosition().getZ());
+                }
+            }
         }
         return materials;
     }
     
     private void clearBlocks(BlockPosition start, int count) {
+        BlockPosition pos = start;
+        BlockPosition end = chunkManager.getEndPosition();
+        
         for (int i = 0; i < count; i++) {
-            BlockPosition pos = start.offset(i, 0, 0);
             Block block = chunkManager.getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
             block.setType(Material.AIR);
+            
+            // Move to next block (wrap to next row if needed)
+            if (i < count - 1) {  // Don't advance after last block
+                pos = pos.offset(1, 0, 0);
+                if (pos.getX() > end.getX()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY(), pos.getZ() + 1);
+                }
+                if (pos.getZ() > end.getZ()) {
+                    pos = new BlockPosition(chunkManager.getStartPosition().getX(), pos.getY() + 1, chunkManager.getStartPosition().getZ());
+                }
+            }
         }
     }
     

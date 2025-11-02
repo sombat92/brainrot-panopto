@@ -30,9 +30,9 @@ database:
     start-x: 0
     start-z: 0
     
-    # Ending chunk coordinates (4x4 chunk area = 64x64 blocks)
-    end-x: 3
-    end-z: 3
+    # Ending chunk coordinates (16x16 chunk area = 256x256 blocks)
+    end-x: 15
+    end-z: 15
   
   storage:
     # Y-level range for data storage
