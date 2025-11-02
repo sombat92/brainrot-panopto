@@ -10,11 +10,14 @@ const cors = require("cors");
 const express = require("express");
 const session = require("express-session");
 
-const PORT_NO = 3000;
+const PORT_NO = 3001; // Backend API server
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow frontend to access backend
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,31 +29,6 @@ const s3 = new cloudflare.S3Client({
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     }
 });
-
-app.get("/viewer", (req, res) => {
-    res.sendFile("viewer.html", {root: __dirname});
-});
-app.get("/test", (req, res) => {
-    res.sendFile("test.html", {root: __dirname});
-});
-app.get("/r2-test", (req, res) => {
-    res.sendFile("r2-test.html", {root: __dirname});
-});
-app.get("/upload", (req, res) => {
-    res.sendFile("upload.html", {root: __dirname});
-});
-app.get("/login", (req, res) => {
-    res.sendFile("login.html", {root: __dirname});
-});
-app.get("/", (req, res) => {
-    res.sendFile("index.html", {root: __dirname});
-});
-app.get("/functions.js", (req, res) => {
-    res.sendFile("functions.js", {root: __dirname});
-});
-app.use("/scripts", express.static(__dirname + "/scripts"));
-app.use("/styles", express.static(__dirname + "/styles"));
-app.use("/public", express.static(__dirname + "/public"));
 
 
 // ============================================
@@ -289,6 +267,11 @@ function getContentType(fileName) {
 }
 
 app.listen(PORT_NO, () => {
-    console.log(`Server running on localhost:${PORT_NO}`);
+    console.log('╔════════════════════════════════════════════╗');
+    console.log('║       Backend API Server (R2)              ║');
+    console.log('╠════════════════════════════════════════════╣');
+    console.log(`║   Running on: http://localhost:${PORT_NO}        ║`);
+    console.log('║   CORS enabled for: http://localhost:3000  ║');
+    console.log('╚════════════════════════════════════════════╝');
 });
 

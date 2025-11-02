@@ -1,3 +1,6 @@
+// Backend API configuration
+const API_BASE_URL = 'http://localhost:3001';
+
 // Demo lecture data with R2 integration
 const lecturesData = [
   {
@@ -105,15 +108,22 @@ const lecturesData = [
 
 // Sample reel data with R2 integration
 const reelsData = [
-  { id: 1, video: "/read-file?folder=reels&fileName=AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4" },
-  { id: 2, video: "/read-file?folder=reels&fileName=AQOlVR7tzd9uy_zTqMHNTASjyZ1aH6xRpzUaP2SpTm6V7QcVaKRIWQcfxNCKZJh7SWwkfRTKRpwxnUryw03rT4A7eZLi6FDEydzDWpM.mp4" },
-  { id: 3, video: "/read-file?folder=reels&fileName=AQPAklItaWZZA9BfewkclZEZYiQW-FZ8KaRl7EhS8g68gnTykamEsA5P1SyomsubbB6a59coxc5TnfIyjw9a3kJyzIFIfq56r5UH9Fg.mp4" },
+  { id: 1, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4` },
+  { id: 2, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQOlVR7tzd9uy_zTqMHNTASjyZ1aH6xRpzUaP2SpTm6V7QcVaKRIWQcfxNCKZJh7SWwkfRTKRpwxnUryw03rT4A7eZLi6FDEydzDWpM.mp4` },
+  { id: 3, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQPAklItaWZZA9BfewkclZEZYiQW-FZ8KaRl7EhS8g68gnTykamEsA5P1SyomsubbB6a59coxc5TnfIyjw9a3kJyzIFIfq56r5UH9Fg.mp4` },
+]
+
+// iPhone popup reels (same videos for now)
+const reelsDataIphone = [
+  { id: 1, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQMLV-yAiIf9wDEIPXQh-5e63gfBAAS5B4S5ggsl0zYoiw2fuhPT2TRYysCPhD9PB3bCAseD2KbD0eu8LmlJl_xLheTXG6ohuo_nWNk.mp4` },
+  { id: 2, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQOlVR7tzd9uy_zTqMHNTASjyZ1aH6xRpzUaP2SpTm6V7QcVaKRIWQcfxNCKZJh7SWwkfRTKRpwxnUryw03rT4A7eZLi6FDEydzDWpM.mp4` },
+  { id: 3, video: `${API_BASE_URL}/read-file?folder=reels&fileName=AQPAklItaWZZA9BfewkclZEZYiQW-FZ8KaRl7EhS8g68gnTykamEsA5P1SyomsubbB6a59coxc5TnfIyjw9a3kJyzIFIfq56r5UH9Fg.mp4` },
 ]
 
 // Function to load lectures dynamically from R2
 async function loadLecturesFromR2() {
   try {
-    const response = await fetch('/list-files?folder=lectures');
+    const response = await fetch(`${API_BASE_URL}/list-files?folder=lectures`);
     const data = await response.json();
     
     if (data.success && data.files) {

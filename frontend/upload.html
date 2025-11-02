@@ -468,7 +468,8 @@
         });
 
         async function uploadFile(file, folder) {
-            const url = `/upload-file?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(file.name)}`;
+            const API_BASE = 'http://localhost:3001';
+            const url = `${API_BASE}/upload-file?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(file.name)}`;
             
             const response = await fetch(url, {
                 method: 'POST',
