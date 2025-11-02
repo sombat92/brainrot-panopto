@@ -12,6 +12,31 @@ commands:
     usage: /<command> [reload|status|clear|test|info]
     permission: mcdb.admin
     permission-message: You don't have permission to use this command
+  
+  dbaccess:
+    description: Manage database access permissions
+    usage: /dbaccess <grant|revoke|list> <player>
+    permission: mcdb.admin
+    permission-message: You don't have permission to use this command!
+  
+  dbadmin:
+    description: Manage database administrators
+    usage: /dbadmin <add|remove|list> <player>
+    permission: mcdb.op
+    permission-message: Only server operators can use this command!
+  
+  dbview:
+    description: View database regions in spectator mode
+    usage: /dbview <reels|lectures|notes|all>
+    permission: mcdb.access
+    permission-message: You don't have database access!
+  
+  dbteleport:
+    description: Teleport to database regions
+    usage: /dbteleport <reels|lectures|notes|all> [x] [z]
+    aliases: [dbtp, dbt]
+    permission: mcdb.access
+    permission-message: You don't have database access!
     
 permissions:
   mcdb.admin:
@@ -19,5 +44,11 @@ permissions:
     default: op
   mcdb.bypass:
     description: Bypass database chunk protection
+    default: op
+  mcdb.access:
+    description: Allows access to database regions
+    default: false
+  mcdb.op:
+    description: Allows managing administrators
     default: op
 

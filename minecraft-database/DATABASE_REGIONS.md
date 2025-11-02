@@ -2,13 +2,19 @@
 
 ## 📊 Architecture Overview
 
-Two separate database regions organized **vertically** (different Y-levels):
+**Three** separate database regions organized **vertically** (different Y-levels):
 
 ```
 ┌─────────────────────────────────────┐
+│     NOTES DATABASE                  │ 
+│     Y: 201-250 (49 blocks high)     │  ← Store user notes
+│     Region: "notes"                 │
+│     Keys: note:*                    │
+├─────────────────────────────────────┤
 │     LECTURES DATABASE               │ 
 │     Y: 105-200 (95 blocks high)     │  ← Store lecture metadata
-│     Region: "lectures"               │
+│     Region: "lectures"              │
+│     Keys: lecture:*                 │
 ├─────────────────────────────────────┤
 │     EMPTY BUFFER ZONE               │
 │     Y: 101-104 (4 blocks)           │  ← Separator
@@ -16,6 +22,7 @@ Two separate database regions organized **vertically** (different Y-levels):
 │     REELS DATABASE                  │
 │     Y: 5-100 (95 blocks high)       │  ← Store reel metadata
 │     Region: "reels"                 │
+│     Keys: reel:*                    │
 └─────────────────────────────────────┘
 ```
 

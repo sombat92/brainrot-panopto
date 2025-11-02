@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupReels()
   setupReels2()
   setupReels3()
+  setupReelsToggle()
 })
 
 /* ============================================================================
@@ -65,8 +66,26 @@ function setupReels() {
     reelsContainer.appendChild(reelItem)
     
     const video = reelItem.querySelector(".reel-video")
-    videos.push({ video, reelItem })
+    videos.push({ video, reelItem, reel })  // Store reel data with video
   })
+  
+  // Function to update footer with current reel's metadata
+  function updateReelFooter(index) {
+    const currentReel = reelsData[index]
+    if (currentReel) {
+      const usernameEl = document.getElementById('reels-username')
+      const descriptionEl = document.getElementById('reels-description')
+      const avatarEl = document.getElementById('reels-avatar')
+      
+      if (usernameEl) usernameEl.textContent = currentReel.username || 'anonymous'
+      if (descriptionEl) descriptionEl.textContent = currentReel.description || 'No description'
+      if (avatarEl) {
+        // Use first two letters of username for avatar
+        const initials = (currentReel.username || 'BR').substring(0, 2).toUpperCase()
+        avatarEl.textContent = initials
+      }
+    }
+  }
 
   // Use Intersection Observer to auto-play only visible reels
   const observerOptions = {
@@ -112,6 +131,7 @@ function setupReels() {
     const targetReel = videos[index].reelItem
     targetReel.scrollIntoView({ behavior: 'smooth', block: 'start' })
     currentReelIndex = index
+    updateReelFooter(index)  // Update footer with new reel's metadata
   }
   
   const scheduleNextScroll = () => {
@@ -124,6 +144,7 @@ function setupReels() {
   }
   
   const startAutoscroll = () => {
+    updateReelFooter(0)  // Initialize with first reel
     scheduleNextScroll()
   }
   
@@ -697,4 +718,145 @@ function stopDragging3(e) {
 
   document.removeEventListener("pointermove", dragReels3, true)
   document.removeEventListener("pointerup", stopDragging3, true)
+}
+
+/* ============================================================================
+   REELS TOGGLE BUTTON - Show/Hide All Reels Simultaneously
+   
+   MERGE NOTE: This section controls the reels popup behavior
+   - Shows all 3 popup styles at once (Instagram, iPhone, Windows 95)
+   - Positions them left, center, and right
+   - Toggle visibility with one button click
+============================================================================ */
+
+function setupReelsToggle() {
+  const toggleBtn = document.getElementById('reelsToggleBtn')
+  if (!toggleBtn) return
+
+  let reelsVisible = false
+
+  toggleBtn.addEventListener('click', () => {
+    if (!reelsVisible) {
+      // Show ALL reels popups at once in different positions
+      hideAllReels() // Clear any existing state
+      
+      // Instagram style - Left
+      if (reelsPopup) {
+        reelsPopup.classList.add('active')
+        positionPopup(reelsPopup, 'left')
+      }
+      
+      // iPhone style - Center
+      if (reelsPopup2) {
+        reelsPopup2.classList.add('active')
+        positionPopup(reelsPopup2, 'center')
+      }
+      
+      // Windows 95 style - Right
+      if (reelsPopup3) {
+        reelsPopup3.classList.add('active')
+        positionPopup(reelsPopup3, 'right')
+      }
+      
+      reelsVisible = true
+      toggleBtn.style.backgroundColor = 'var(--accent-light)'
+      toggleBtn.style.borderColor = 'var(--accent-primary)'
+    } else {
+      // Hide all reels
+      hideAllReels()
+      reelsVisible = false
+      toggleBtn.style.backgroundColor = ''
+      toggleBtn.style.borderColor = ''
+    }
+  })
+
+  // Also allow clicking outside reels to hide them
+  document.addEventListener('click', (e) => {
+    if (reelsVisible && 
+        !reelsPopup?.contains(e.target) && 
+        !reelsPopup2?.contains(e.target) && 
+        !reelsPopup3?.contains(e.target) &&
+        !toggleBtn.contains(e.target)) {
+      hideAllReels()
+      reelsVisible = false
+      toggleBtn.style.backgroundColor = ''
+      toggleBtn.style.borderColor = ''
+    }
+  })
+
+  // Add close buttons to each popup
+  addCloseButtons()
+}
+
+function hideAllReels() {
+  if (reelsPopup) reelsPopup.classList.remove('active')
+  if (reelsPopup2) reelsPopup2.classList.remove('active')
+  if (reelsPopup3) reelsPopup3.classList.remove('active')
+}
+
+function positionPopup(popup, position) {
+  popup.style.position = 'fixed'
+  popup.style.top = '80px'
+  
+  if (position === 'left') {
+    popup.style.left = '20px'
+    popup.style.right = 'auto'
+  } else if (position === 'center') {
+    popup.style.left = '50%'
+    popup.style.right = 'auto'
+    popup.style.transform = 'translateX(-50%)'
+  } else if (position === 'right') {
+    popup.style.right = '20px'
+    popup.style.left = 'auto'
+  }
+}
+
+function addCloseButtons() {
+  // Add close button to each popup's header
+  const popups = [
+    { popup: reelsPopup, headerSelector: '.reels-top' },
+    { popup: reelsPopup2, headerSelector: '.reels-top' },
+    { popup: reelsPopup3, headerSelector: '.win95-controls' }
+  ]
+
+  popups.forEach(({ popup, headerSelector }) => {
+    if (!popup) return
+    
+    const header = popup.querySelector(headerSelector)
+    if (!header) return
+
+    // Check if close button already exists
+    if (header.querySelector('.reels-close-btn')) return
+
+    const closeBtn = document.createElement('button')
+    closeBtn.className = 'reels-close-btn'
+    closeBtn.innerHTML = '×'
+    closeBtn.style.pointerEvents = 'auto'
+    closeBtn.title = 'Close'
+    
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      popup.classList.remove('active')
+      
+      const toggleBtn = document.getElementById('reelsToggleBtn')
+      if (toggleBtn) {
+        toggleBtn.style.backgroundColor = ''
+        toggleBtn.style.borderColor = ''
+      }
+    })
+
+    if (popup === reelsPopup3) {
+      // For Windows 95, replace the × button
+      const existingClose = header.querySelector('.win95-close')
+      if (existingClose) {
+        existingClose.onclick = (e) => {
+          e.stopPropagation()
+          popup.classList.remove('active')
+        }
+      }
+    } else {
+      // For Instagram and iPhone styles, add to header
+      header.appendChild(closeBtn)
+    }
+  })
 }

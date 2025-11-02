@@ -6,6 +6,7 @@
   <title>Lecture Viewer</title>
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/styles/viewer.css">
+  <link rel="stylesheet" href="/styles/reels.css">
 </head>
 <body>
   <div class="viewer-container">
@@ -25,6 +26,11 @@
         </div>
       </div>
       <div class="header-right">
+        <button class="reels-toggle-btn" id="reelsToggleBtn" title="Show Reels">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+          </svg>
+        </button>
         <button class="help-button" title="Help">?</button>
         <div class="user-avatar">HA</div>
       </div>
@@ -32,8 +38,10 @@
 
     <!-- Main Content Area -->
     <div class="viewer-main">
-      <!-- Left Sidebar Navigation -->
-      <aside class="viewer-sidebar">
+      <!-- Left Column: Sidebar + Notes -->
+      <div class="viewer-left-column">
+        <!-- Sidebar Navigation -->
+        <aside class="viewer-sidebar">
         <!-- Search -->
         <div class="sidebar-search">
           <input type="text" placeholder="Search this recording" id="sidebar-search">
@@ -121,6 +129,24 @@
         </div>
       </aside>
 
+        <!-- Notes Panel (Bottom Left) -->
+        <aside class="notes-panel">
+        <div class="notes-header">
+          <h3>Notes</h3>
+          <div class="notes-status" id="notes-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Saved</span>
+          </div>
+        </div>
+          <textarea id="notes-textarea" class="notes-textarea" placeholder="Take notes while watching...
+
+Your notes are automatically saved to Minecraft database!"></textarea>
+          <div class="notes-footer">
+            <span class="notes-info">Auto-saves to Minecraft (Y: 201-250)</span>
+          </div>
+        </aside>
+      </div>
+
       <!-- Main Video Area -->
       <main class="viewer-main-content">
         <!-- Video Player -->
@@ -170,14 +196,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Notes Section -->
-          <div class="notes-section">
-            <div class="notes-header">
-              <h3>Notes</h3>
-            </div>
-            <textarea id="notes-textarea" class="notes-textarea" placeholder="Add your notes here..."></textarea>
-          </div>
         </div>
       </main>
     </div>
@@ -226,10 +244,10 @@
     </div>
     <div class="reels-footer">
       <div class="reels-user-info">
-        <div class="reels-avatar">FF</div>
+        <div class="reels-avatar" id="reels-avatar">BR</div>
         <div class="reels-user-details">
           <div class="reels-username-row">
-            <span class="reels-username">frenchie_fry39</span>
+            <span class="reels-username" id="reels-username">loading...</span>
             <svg class="reels-verified" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
@@ -237,7 +255,7 @@
           </div>
         </div>
       </div>
-      <p class="reels-description">The otherworldly feeling you get when you d...</p>
+      <p class="reels-description" id="reels-description">loading description...</p>
     </div>
   </div>
 
@@ -371,6 +389,7 @@
   <script src="/scripts/minecraft-db.js"></script>
   <script src="/scripts/viewer.js"></script>
   <script src="/scripts/functions.js"></script>
+  <script src="/scripts/notes-autosave.js"></script>
   <script>
     GetVideo(document.getElementById("LectureVideoSource"), document.getElementById("LectureVideoPlayer"), "lectures", "DE Intro.mp4");
   </script>
