@@ -274,4 +274,3 @@ app.listen(PORT_NO, () => {
     console.log('║   CORS enabled for: http://localhost:3000  ║');
     console.log('╚════════════════════════════════════════════╝');
 });
-
