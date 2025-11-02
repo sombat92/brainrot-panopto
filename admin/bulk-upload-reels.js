@@ -53,16 +53,18 @@ async function uploadFile(filePath, folder = 'reels') {
   console.log(`${colors.cyan}📤 Uploading: ${filename} (${fileSizeMB} MB)${colors.reset}`);
   
   try {
-    // Create form data
-    const form = new FormData();
-    form.append('file', fs.createReadStream(filePath));
+    // Read file as buffer (raw binary data)
+    const fileBuffer = fs.readFileSync(filePath);
     
     // Upload to R2
     const uploadUrl = `${BACKEND_API}/upload-file?folder=${encodeURIComponent(folder)}&fileName=${encodeURIComponent(filename)}`;
     const response = await fetch(uploadUrl, {
       method: 'POST',
-      body: form,
-      headers: form.getHeaders()
+      body: fileBuffer,
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Length': fileSize.toString()
+      }
     });
     
     const data = await response.json();

@@ -33,10 +33,15 @@ let cascadedPopups = [] // Track cascaded popup 3 clones
 let allPopups = [] // Track all draggable popups for z-index management
 let currentHighestZ = 1000 // Track the highest z-index
 
-// lecturesData and reelsData are defined in data.js which loads before this file
+// lecturesData and reelsData - will be loaded from API
+let reelsData = []
+let reelsDataIphone = []
 
 // Initialize
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Load reels from Minecraft database first
+  await loadReelsFromAPI()
+  
   loadLecture()
   setupVideoListeners()
   setupControlListeners()
@@ -63,6 +68,47 @@ document.addEventListener("DOMContentLoaded", () => {
     setupPopupClickToFront(reelsPopup3)
   }
 })
+
+/* ============================================================================
+   LOAD REELS FROM API
+============================================================================ */
+async function loadReelsFromAPI() {
+  try {
+    const response = await fetch('http://localhost:3002/mcdb/reels/list')
+    const data = await response.json()
+    
+    if (data.success && data.reels && data.reels.length > 0) {
+      // Transform API data to frontend format
+      reelsData = data.reels.map(reel => ({
+        video: `http://localhost:3001/get-file?key=${encodeURIComponent(reel.r2_key)}`,
+        username: reel.username || 'anonymous',
+        description: reel.description || 'No description',
+        likes: reel.likes || 0,
+        views: reel.views || 0,
+        avatar: `https://i.pravatar.cc/150?u=${reel.username}`
+      }))
+      
+      // Copy to iPhone data
+      reelsDataIphone = [...reelsData]
+      
+      console.log(`✅ Loaded ${reelsData.length} reels from Minecraft database`)
+    } else {
+      console.warn('⚠️ No reels found in database, using fallback data')
+      // Fallback to static data if available
+      if (typeof window.reelsData !== 'undefined') {
+        reelsData = window.reelsData
+        reelsDataIphone = window.reelsDataIphone || reelsData
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error loading reels:', error)
+    // Fallback to static data if available
+    if (typeof window.reelsData !== 'undefined') {
+      reelsData = window.reelsData
+      reelsDataIphone = window.reelsDataIphone || reelsData
+    }
+  }
+}
 
 /* ============================================================================
    ✅ FIXED DRAGGABLE POPUP — pointer events only
