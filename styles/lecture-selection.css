@@ -203,6 +203,40 @@
   gap: 24px;
 }
 
+/* Horizontal scrolling for What's New section */
+#whats-new-grid {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 24px;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+#whats-new-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+#whats-new-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#whats-new-grid::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+}
+
+#whats-new-grid::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+#whats-new-grid .lecture-card {
+  flex: 0 0 260px;
+  min-width: 260px;
+}
+
 /* Lecture Card */
 .lecture-card {
   background-color: var(--bg-secondary);
@@ -302,6 +336,11 @@
   .lectures-grid {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
+  
+  #whats-new-grid .lecture-card {
+    flex: 0 0 220px;
+    min-width: 220px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -332,6 +371,15 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 16px;
   }
+  
+  #whats-new-grid {
+    gap: 16px;
+  }
+  
+  #whats-new-grid .lecture-card {
+    flex: 0 0 180px;
+    min-width: 180px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -360,6 +408,15 @@
   .lectures-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 12px;
+  }
+  
+  #whats-new-grid {
+    gap: 12px;
+  }
+  
+  #whats-new-grid .lecture-card {
+    flex: 0 0 150px;
+    min-width: 150px;
   }
 
   .section-title {
