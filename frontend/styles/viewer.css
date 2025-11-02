@@ -1088,12 +1088,12 @@
 .reels-popup-iphone {
   left: 470px;
   top: calc(100vh - 300px);
-  width: 280px;
-  height: 560px;
+  width: 196px;
+  height: 392px;
   background: #000;
-  border: 12px solid #1a1a1a;
-  border-radius: 42px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
+  border: 8px solid #1a1a1a;
+  border-radius: 29px;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.5), 
               inset 0 0 2px rgba(255, 255, 255, 0.1);
   padding: 0;
   display: flex;
@@ -1113,23 +1113,23 @@
 <<<<<<< HEAD
 .iphone-speaker {
   position: absolute;
-  top: 8px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 50px;
-  height: 5px;
+  width: 35px;
+  height: 3px;
   background: #0a0a0a;
-  border-radius: 3px;
+  border-radius: 2px;
   z-index: 2001;
 }
 
 .iphone-camera {
   position: absolute;
-  top: 8px;
+  top: 6px;
   left: 50%;
-  transform: translateX(35px);
-  width: 10px;
-  height: 10px;
+  transform: translateX(25px);
+  width: 7px;
+  height: 7px;
   background: #0a0a0a;
   border-radius: 50%;
   z-index: 2001;
@@ -1138,21 +1138,21 @@
 
 .iphone-home-indicator {
   position: absolute;
-  bottom: 6px;
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 4px;
+  width: 84px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 2px;
   z-index: 2000;
 }
 
 .reels-popup-iphone .reels-header {
-  margin-top: 30px;
+  margin-top: 21px;
   background: transparent;
   backdrop-filter: none;
-  padding: 8px 12px;
+  padding: 6px 8px;
   flex-shrink: 0;
   position: relative;
   z-index: 10;

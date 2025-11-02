@@ -255,12 +255,12 @@
    ================================================================== */
 
 .reels-popup-iphone {
-  width: 390px;
-  height: 844px;
-  border-radius: 40px;
+  width: 273px;
+  height: 591px;
+  border-radius: 28px;
   background: #000;
-  border: 12px solid #1d1d1f;
-  box-shadow: 0 0 0 4px #3a3a3c, 0 24px 48px rgba(0, 0, 0, 0.5);
+  border: 8px solid #1d1d1f;
+  box-shadow: 0 0 0 3px #3a3a3c, 0 17px 34px rgba(0, 0, 0, 0.5);
   position: relative;
 }
 
@@ -270,40 +270,40 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 180px;
-  height: 30px;
+  width: 126px;
+  height: 21px;
   background: #1d1d1f;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
   z-index: 20;
 }
 
 .iphone-speaker {
   position: absolute;
-  top: 8px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 6px;
+  width: 42px;
+  height: 4px;
   background: #0a0a0a;
-  border-radius: 3px;
+  border-radius: 2px;
   z-index: 21;
 }
 
 .iphone-camera {
   position: absolute;
-  top: 8px;
-  right: 80px;
-  width: 12px;
-  height: 12px;
+  top: 6px;
+  right: 56px;
+  width: 8px;
+  height: 8px;
   background: #0a0a0a;
   border-radius: 50%;
   z-index: 21;
-  box-shadow: inset 0 0 3px rgba(0, 100, 255, 0.5);
+  box-shadow: inset 0 0 2px rgba(0, 100, 255, 0.5);
 }
 
 .iphone-header {
-  padding-top: 44px;
+  padding-top: 31px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
 }
 
@@ -322,19 +322,19 @@
 }
 
 .iphone-back-btn svg, .iphone-camera-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 17px;
+  height: 17px;
 }
 
 .iphone-home-indicator {
   position: absolute;
-  bottom: 8px;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 140px;
-  height: 5px;
+  width: 98px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
+  border-radius: 2px;
   z-index: 20;
 }
 

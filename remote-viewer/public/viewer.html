@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote Viewer – Viewer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #020617;
+      color: #e2e8f0;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.22), transparent 55%),
+        radial-gradient(circle at bottom, rgba(236, 72, 153, 0.18), transparent 55%),
+        #020617;
+    }
+
+    main {
+      width: min(960px, 100%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      border-radius: 18px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    header p {
+      margin: 0.4rem 0 0 0;
+      color: rgba(226, 232, 240, 0.8);
+      line-height: 1.6;
+    }
+
+    video {
+      width: 100%;
+      max-height: 65vh;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: rgba(2, 6, 23, 0.65);
+      aspect-ratio: 16 / 9;
+      display: block;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    button {
+      padding: 0.85rem 1.4rem;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #22d3ee, #6366f1);
+      color: #020617;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(99, 102, 241, 0.32);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .status {
+      display: grid;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .status span {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .status .label {
+      font-weight: 600;
+      color: rgba(148, 163, 184, 0.92);
+      min-width: 7rem;
+    }
+
+    .hint {
+      font-size: 0.9rem;
+      color: rgba(148, 163, 184, 0.85);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Viewer</h1>
+      <p>Keep this page open to receive the screen share from the sender. Click <strong>Enable Video</strong> once the stream is ready.</p>
+    </header>
+
+    <video id="remoteVideo" playsinline></video>
+
+    <div class="controls">
+      <button id="playButton" disabled>Enable Video</button>
+      <button id="fullscreenButton" disabled>Toggle Fullscreen</button>
+    </div>
+
+    <section class="status">
+      <span><strong class="label">Signaling:</strong><span id="signalingStatus">Disconnected</span></span>
+      <span><strong class="label">Peer:</strong><span id="peerStatus">Waiting</span></span>
+      <span><strong class="label">Stream:</strong><span id="streamStatus">Idle</span></span>
+      <p class="hint">Tip: If nothing appears, make sure the sender has started sharing and both devices are on the same LAN.</p>
+    </section>
+  </main>
+  <script type="module" src="viewer.js"></script>
+</body>
+</html>
