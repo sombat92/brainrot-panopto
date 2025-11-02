@@ -1,0 +1,14 @@
+{
+  "name": "remote-viewer-server",
+  "version": "1.0.0",
+  "description": "WebRTC signaling server for Remote Viewer",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}

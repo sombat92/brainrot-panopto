@@ -1,17 +1,7 @@
-// DOM Elements
-const video = document.getElementById("lecture-video")
-const playPauseBtn = document.getElementById("playPauseBtn")
-const skipBackBtn = document.getElementById("skipBackBtn")
-const skipForwardBtn = document.getElementById("skipForwardBtn")
-const muteBtn = document.getElementById("muteBtn")
-const progressBar = document.getElementById("progressBar")
-const progressFill = progressBar.querySelector(".progress-fill")
-const progressHandle = progressBar.querySelector(".progress-handle")
-const timeDisplay = document.getElementById("timeDisplay")
-
-const reelsPopup = document.getElementById("reels-popup")
-const reelsPopup2 = document.getElementById("reels-popup-2")
-const reelsPopup3 = document.getElementById("reels-popup-3")
+// DOM Elements - will be initialized after DOM loads
+let video, playPauseBtn, skipBackBtn, skipForwardBtn, muteBtn
+let progressBar, progressFill, progressHandle, timeDisplay
+let reelsPopup, reelsPopup2, reelsPopup3
 
 // Separate dragging state for each popup
 let isDraggingReels1 = false
@@ -47,6 +37,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupControlListeners()
   setupTabSwitching()
   loadNotesFromStorage()
+  
+  // Ensure all popups start hidden (disabled)
+  if (reelsPopup) {
+    reelsPopup.style.display = 'none'
+    reelsPopup.classList.remove('active')
+  }
+  if (reelsPopup2) {
+    reelsPopup2.style.display = 'none'
+    reelsPopup2.classList.remove('active')
+    console.log("reelsPopup2 initialized and hidden")
+  }
+  if (reelsPopup3) {
+    reelsPopup3.style.display = 'none'
+    reelsPopup3.classList.remove('active')
+  }
+  
   setupReels()
   setupReels2()
   setupReels3()
@@ -798,41 +804,100 @@ function setupKeyboardShortcuts() {
       return
     }
 
-    switch(e.key) {
-      case "1":
-        e.preventDefault()
+    // Check both e.key and e.code to handle different browsers
+    const key = e.key || e.code
+    
+    // Handle number keys - check both "1" and "Digit1" formats
+    if (key === "1" || key === "Digit1") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      console.log("Key 1 pressed, toggling popup 2. reelsPopup2:", reelsPopup2)
+      if (reelsPopup2) {
         togglePopup(reelsPopup2) // iPhone popup (popup 2)
-        break
-      case "2":
-        e.preventDefault()
-        togglePopup(reelsPopup) // Original popup (popup 1)
-        break
-      case "3":
-        e.preventDefault()
-        playWindowErrorSound()
-        togglePopup(reelsPopup3) // Windows 95 popup (popup 3)
-        break
-      case "4":
-        e.preventDefault()
-        playWindowErrorSound()
-        createCascadedPopup()
-        break
+      } else {
+        console.error("reelsPopup2 is not defined!")
+      }
+      return false
+    } else if (key === "2" || key === "Digit2") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      togglePopup(reelsPopup) // Original popup (popup 1)
+      return false
+    } else if (key === "3" || key === "Digit3") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      togglePopup(reelsPopup3) // Windows 95 popup (popup 3)
+      return false
+    } else if (key === "4" || key === "Digit4") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      playWindowErrorSound()
+      createCascadedPopup()
+      return false
+    } else if (key === "5" || key === "Digit5") {
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      createAutoCascade()
+      return false
     }
-  })
+  }, true) // Use capture phase to catch events before other handlers
 }
 
 function togglePopup(popup) {
-  if (!popup) return
+  if (!popup) {
+    console.error("togglePopup: popup is null or undefined")
+    return
+  }
   
-  // Check current display state
-  const computedStyle = getComputedStyle(popup)
-  const currentDisplay = popup.style.display || computedStyle.display
-  
-  // Toggle visibility
-  if (currentDisplay === "none") {
-    popup.style.display = "flex"
+  // Toggle visibility using the .active class to work with toggle button
+  if (popup.classList.contains('active')) {
+    popup.classList.remove('active')
+    popup.style.display = 'none'
+    console.log("Hiding popup:", popup.id)
   } else {
-    popup.style.display = "none"
+    popup.classList.add('active')
+    popup.style.display = 'flex'
+    // Ensure popup is positioned correctly
+    popup.style.position = 'fixed'
+    // Ensure visibility and z-index
+    popup.style.visibility = 'visible'
+    popup.style.opacity = '1'
+    if (!popup.style.zIndex || parseInt(popup.style.zIndex) < 1000) {
+      popup.style.zIndex = '1000'
+    }
+    // If popup doesn't have explicit inline positioning (preserves user dragging),
+    // give it default positioning based on popup type
+    const hasInlinePosition = popup.style.left || popup.style.right || popup.style.top || popup.style.bottom
+    
+    if (!hasInlinePosition) {
+      const popupId = popup.id
+      if (popupId === 'reels-popup-3') {
+        // Popup 3: 50px from left, 150px from top
+        popup.style.left = '50px'
+        popup.style.top = '150px'
+        popup.style.right = 'auto'
+        popup.style.bottom = 'auto'
+      } else if (popupId === 'reels-popup') {
+        // Popup 1: 100px from right, 40% from top
+        popup.style.right = '100px'
+        popup.style.top = '40%'
+        popup.style.left = 'auto'
+        popup.style.bottom = 'auto'
+      } else if (popupId === 'reels-popup-2') {
+        // Popup 2: 40% from left, slightly off page at bottom
+        popup.style.left = '40%'
+        popup.style.bottom = '-100px'
+        popup.style.top = 'auto'
+        popup.style.right = 'auto'
+      }
+      popup.style.transform = 'none'
+    }
+    console.log("Showing popup:", popup.id, "Display:", popup.style.display, "Active:", popup.classList.contains('active'), "Position:", popup.style.position, "Top:", popup.style.top)
   }
 }
 
@@ -898,7 +963,7 @@ function playWindowErrorSound() {
 function createCascadedPopup() {
   if (!reelsPopup3) {
     console.error("reelsPopup3 not found!")
-    return
+    return false
   }
 
   // Get the original popup's position
@@ -934,7 +999,7 @@ function createCascadedPopup() {
   
   if (isCompletelyOffRight || isCompletelyOffBottom || isCompletelyOffLeft || isCompletelyOffTop) {
     console.log("Cascade popup would be completely off screen, stopping")
-    return
+    return false
   }
   
   // Clone the popup
@@ -997,9 +1062,50 @@ function createCascadedPopup() {
   const createdPopup = document.getElementById(cloneId)
   if (createdPopup) {
     console.log("✅ Cascaded popup successfully created and visible")
+    return true
   } else {
     console.error("❌ Failed to create cascaded popup")
+    return false
   }
+}
+
+/* ============================================================================
+   AUTO CASCADE FUNCTIONALITY - Automatically create cascaded popups until off-screen
+============================================================================ */
+
+function createAutoCascade() {
+  if (!reelsPopup3) {
+    console.error("reelsPopup3 not found!")
+    return
+  }
+
+  // Keep creating cascaded popups until one fails (goes off-screen)
+  // Use a small delay between each creation so the sound plays properly
+  let cascadeCount = 0
+  
+  const createNext = () => {
+    const popupCountBefore = cascadedPopups.length
+    const success = createCascadedPopup()
+    const popupCountAfter = cascadedPopups.length
+    
+    // Play sound if a popup was actually created
+    if (popupCountAfter > popupCountBefore) {
+      playWindowErrorSound()
+      cascadeCount++
+      
+      // Continue creating more with a small delay
+      // The delay ensures sounds play properly and gives a nice cascading effect
+      setTimeout(() => {
+        createNext()
+      }, 150) // 150ms delay between each popup creation
+    } else {
+      // No popup was created (would be off-screen), stop cascading
+      console.log(`Auto cascade complete: created ${cascadeCount} popups`)
+    }
+  }
+  
+  // Start the cascade
+  createNext()
 }
 
 function setupCascadeReels(clone, containerId) {
@@ -1235,20 +1341,31 @@ function setupReelsToggle() {
       // Instagram style - Left
       if (reelsPopup) {
         reelsPopup.classList.add('active')
+        reelsPopup.style.display = 'flex'
         positionPopup(reelsPopup, 'left')
       }
       
       // iPhone style - Center
       if (reelsPopup2) {
         reelsPopup2.classList.add('active')
+        reelsPopup2.style.display = 'flex'
         positionPopup(reelsPopup2, 'center')
       }
       
       // Windows 95 style - Right
       if (reelsPopup3) {
         reelsPopup3.classList.add('active')
+        reelsPopup3.style.display = 'flex'
         positionPopup(reelsPopup3, 'right')
       }
+      
+      // Also show all cascaded popup3s
+      cascadedPopups.forEach(clone => {
+        if (clone) {
+          clone.classList.add('active')
+          clone.style.display = 'flex'
+        }
+      })
       
       reelsVisible = true
       toggleBtn.style.backgroundColor = 'var(--accent-light)'
@@ -1268,7 +1385,8 @@ function setupReelsToggle() {
         !reelsPopup?.contains(e.target) && 
         !reelsPopup2?.contains(e.target) && 
         !reelsPopup3?.contains(e.target) &&
-        !toggleBtn.contains(e.target)) {
+        !toggleBtn.contains(e.target) &&
+        !cascadedPopups.some(clone => clone?.contains(e.target))) {
       hideAllReels()
       reelsVisible = false
       toggleBtn.style.backgroundColor = ''
@@ -1281,25 +1399,56 @@ function setupReelsToggle() {
 }
 
 function hideAllReels() {
-  if (reelsPopup) reelsPopup.classList.remove('active')
-  if (reelsPopup2) reelsPopup2.classList.remove('active')
-  if (reelsPopup3) reelsPopup3.classList.remove('active')
+  if (reelsPopup) {
+    reelsPopup.classList.remove('active')
+    reelsPopup.style.display = 'none'
+  }
+  if (reelsPopup2) {
+    reelsPopup2.classList.remove('active')
+    reelsPopup2.style.display = 'none'
+  }
+  if (reelsPopup3) {
+    reelsPopup3.classList.remove('active')
+    reelsPopup3.style.display = 'none'
+  }
+  // Also hide all cascaded popup3s
+  cascadedPopups.forEach(clone => {
+    if (clone) {
+      clone.classList.remove('active')
+      clone.style.display = 'none'
+    }
+  })
 }
 
 function positionPopup(popup, position) {
-  popup.style.position = 'fixed'
-  popup.style.top = '80px'
+  if (!popup) return
   
-  if (position === 'left') {
-    popup.style.left = '20px'
+  popup.style.position = 'fixed'
+  
+  // Determine which popup this is based on position parameter or popup ID
+  const popupId = popup.id
+  
+  if (popupId === 'reels-popup-3' || position === 'right') {
+    // Popup 3: 50px from left, 150px from top
+    popup.style.left = '50px'
+    popup.style.top = '150px'
     popup.style.right = 'auto'
-  } else if (position === 'center') {
-    popup.style.left = '50%'
-    popup.style.right = 'auto'
-    popup.style.transform = 'translateX(-50%)'
-  } else if (position === 'right') {
-    popup.style.right = '20px'
+    popup.style.bottom = 'auto'
+    popup.style.transform = 'none'
+  } else if (popupId === 'reels-popup' || position === 'left') {
+    // Popup 1: 100px from right, 40% from top
+    popup.style.right = '100px'
+    popup.style.top = '40%'
     popup.style.left = 'auto'
+    popup.style.bottom = 'auto'
+    popup.style.transform = 'none'
+  } else if (popupId === 'reels-popup-2' || position === 'center') {
+    // Popup 2: 40% from left, slightly off page at bottom
+    popup.style.left = '40%'
+    popup.style.bottom = '-100px' // Slightly off the page at the bottom
+    popup.style.top = 'auto'
+    popup.style.right = 'auto'
+    popup.style.transform = 'none'
   }
 }
 
@@ -1329,11 +1478,18 @@ function addCloseButtons() {
     closeBtn.addEventListener('click', (e) => {
       e.stopPropagation()
       popup.classList.remove('active')
+      popup.style.display = 'none'
       
       const toggleBtn = document.getElementById('reelsToggleBtn')
       if (toggleBtn) {
-        toggleBtn.style.backgroundColor = ''
-        toggleBtn.style.borderColor = ''
+        // Check if all popups are closed to update toggle button state
+        const allClosed = !reelsPopup?.classList.contains('active') && 
+                          !reelsPopup2?.classList.contains('active') && 
+                          !reelsPopup3?.classList.contains('active')
+        if (allClosed) {
+          toggleBtn.style.backgroundColor = ''
+          toggleBtn.style.borderColor = ''
+        }
       }
     })
 
@@ -1344,6 +1500,19 @@ function addCloseButtons() {
         existingClose.onclick = (e) => {
           e.stopPropagation()
           popup.classList.remove('active')
+          popup.style.display = 'none'
+          
+          const toggleBtn = document.getElementById('reelsToggleBtn')
+          if (toggleBtn) {
+            // Check if all popups are closed to update toggle button state
+            const allClosed = !reelsPopup?.classList.contains('active') && 
+                              !reelsPopup2?.classList.contains('active') && 
+                              !reelsPopup3?.classList.contains('active')
+            if (allClosed) {
+              toggleBtn.style.backgroundColor = ''
+              toggleBtn.style.borderColor = ''
+            }
+          }
         }
       }
     } else {
