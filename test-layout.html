@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Layout Test</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    .container { display: flex; height: 100vh; }
+    .left-column {
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      background: #f0f0f0;
+      border-right: 2px solid #ccc;
+    }
+    .sidebar {
+      flex: 1;
+      background: #e8e8e8;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .notes {
+      min-height: 250px;
+      max-height: 400px;
+      background: #d8d8d8;
+      border-top: 2px solid #ccc;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .main {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+    }
+    h3 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-column">
+      <div class="sidebar">
+        <h3>Sidebar (Top)</h3>
+        <p>Details</p>
+        <p>Contents</p>
+        <p>Captions</p>
+        <p>Discussion</p>
+        <p>Bookmarks</p>
+      </div>
+      <div class="notes">
+        <h3>Notes (Bottom Left)</h3>
+        <textarea style="width: 100%; height: 150px;">Take notes here...</textarea>
+      </div>
+    </div>
+    <div class="main">
+      <h3>Video Player (Right)</h3>
+      <p>Video content would go here</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,485 @@
+/* ==================================================================
+   REELS STYLING - Instagram/TikTok Style Popups
+   ================================================================== */
+
+/* Reels Popup - Base Styles */
+.reels-popup {
+  position: fixed;
+  width: 360px;
+  height: 640px;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 12px 24px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  cursor: move;
+  user-select: none;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.reels-popup.active {
+  display: flex;
+  animation: reelsPopIn 0.3s ease forwards;
+}
+
+@keyframes reelsPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Close button */
+.reels-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: background 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.reels-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Reels Header */
+.reels-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+  z-index: 10;
+}
+
+.reels-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reels-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reels-label {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.reels-dropdown-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+/* Reels Container - Scrollable vertical feed */
+.reels-container {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.reels-container::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-item {
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Reels Actions - Like, comment, share buttons */
+.reels-actions {
+  position: absolute;
+  right: 12px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.action-item:hover {
+  transform: scale(1.1);
+}
+
+.action-item:active {
+  transform: scale(0.95);
+}
+
+.action-item svg {
+  width: 28px;
+  height: 28px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.action-count {
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Reels Footer - User info and description */
+.reels-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  z-index: 10;
+}
+
+.reels-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.reels-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.reels-username-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reels-username {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.reels-verified {
+  width: 14px;
+  height: 14px;
+  color: #3897f0;
+}
+
+.reels-follow-btn {
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reels-follow-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.reels-description {
+  color: white;
+  font-size: 13px;
+  line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ==================================================================
+   IPHONE STYLE POPUP
+   ================================================================== */
+
+.reels-popup-iphone {
+  width: 390px;
+  height: 844px;
+  border-radius: 40px;
+  background: #000;
+  border: 12px solid #1d1d1f;
+  box-shadow: 0 0 0 4px #3a3a3c, 0 24px 48px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* iPhone notch */
+.iphone-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 30px;
+  background: #1d1d1f;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  z-index: 20;
+}
+
+.iphone-speaker {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 6px;
+  background: #0a0a0a;
+  border-radius: 3px;
+  z-index: 21;
+}
+
+.iphone-camera {
+  position: absolute;
+  top: 8px;
+  right: 80px;
+  width: 12px;
+  height: 12px;
+  background: #0a0a0a;
+  border-radius: 50%;
+  z-index: 21;
+  box-shadow: inset 0 0 3px rgba(0, 100, 255, 0.5);
+}
+
+.iphone-header {
+  padding-top: 44px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+}
+
+.iphone-back-btn, .iphone-camera-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.iphone-back-btn:hover, .iphone-camera-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.iphone-back-btn svg, .iphone-camera-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.iphone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  z-index: 20;
+}
+
+/* ==================================================================
+   WINDOWS 95 STYLE POPUP
+   ================================================================== */
+
+.reels-popup-win95 {
+  width: 400px;
+  height: 600px;
+  border-radius: 0;
+  border: 2px solid #c0c0c0;
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #808080;
+  border-right-color: #808080;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+  background: #c0c0c0;
+}
+
+.win95-titlebar {
+  height: 24px;
+  background: linear-gradient(90deg, #000080, #1084d0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.win95-title {
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: "MS Sans Serif", sans-serif;
+  padding-left: 4px;
+}
+
+.win95-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.win95-btn {
+  width: 18px;
+  height: 18px;
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: "MS Sans Serif", sans-serif;
+}
+
+.win95-btn:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+.win95-menubar {
+  height: 20px;
+  background: #c0c0c0;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 8px;
+}
+
+.win95-menu-item {
+  font-size: 11px;
+  font-family: "MS Sans Serif", sans-serif;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.win95-menu-item:hover {
+  background: #000080;
+  color: white;
+}
+
+.win95-statusbar {
+  height: 20px;
+  background: #c0c0c0;
+  border-top: 1px solid #ffffff;
+  border-bottom: 2px solid #808080;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.win95-status-text {
+  font-size: 11px;
+  font-family: "MS Sans Serif", sans-serif;
+  color: #000;
+}
+
+.reels-popup-win95 .reels-container {
+  background: #000;
+  height: calc(100% - 64px);
+}
+
+.win95-footer {
+  bottom: 20px;
+}
+
+/* ==================================================================
+   DRAGGABLE FUNCTIONALITY
+   ================================================================== */
+
+.reels-popup:active {
+  cursor: grabbing;
+}
+
+/* ==================================================================
+   RESPONSIVE ADJUSTMENTS
+   ================================================================== */
+
+@media (max-width: 768px) {
+  .reels-popup {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  .reels-popup-iphone,
+  .reels-popup-win95 {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .iphone-notch,
+  .iphone-speaker,
+  .iphone-camera,
+  .iphone-home-indicator {
+    display: none;
+  }
+}
+

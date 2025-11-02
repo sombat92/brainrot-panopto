@@ -1,9 +1,11 @@
 package com.brainrot.mcdb;
 
+import com.brainrot.mcdb.commands.DatabaseCommands;
 import com.brainrot.mcdb.database.BlockDatabase;
 import com.brainrot.mcdb.database.ChunkManager;
 import com.brainrot.mcdb.socket.SocketServer;
 import com.brainrot.mcdb.utils.ConfigManager;
+import com.brainrot.mcdb.utils.PermissionManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,6 +18,8 @@ public class MinecraftDBPlugin extends JavaPlugin {
     private ChunkManager chunkManager;
     private BlockDatabase blockDatabase;
     private SocketServer socketServer;
+    private PermissionManager permissionManager;
+    private DatabaseCommands databaseCommands;
     
     @Override
     public void onEnable() {
@@ -26,6 +30,7 @@ public class MinecraftDBPlugin extends JavaPlugin {
         
         // Initialize managers
         configManager = new ConfigManager(this);
+        permissionManager = new PermissionManager(getDataFolder());
         
         getLogger().info("Initializing Minecraft Database Plugin...");
         
@@ -47,7 +52,20 @@ public class MinecraftDBPlugin extends JavaPlugin {
                 getLogger().info("Socket server started on port " + configManager.getSocketPort());
             }
             
+            // Register database commands
+            databaseCommands = new DatabaseCommands(this, permissionManager);
+            getCommand("dbaccess").setExecutor(databaseCommands);
+            getCommand("dbadmin").setExecutor(databaseCommands);
+            getCommand("dbview").setExecutor(databaseCommands);
+            getCommand("dbteleport").setExecutor(databaseCommands);
+            
+            getCommand("dbaccess").setTabCompleter(databaseCommands);
+            getCommand("dbadmin").setTabCompleter(databaseCommands);
+            getCommand("dbview").setTabCompleter(databaseCommands);
+            getCommand("dbteleport").setTabCompleter(databaseCommands);
+            
             getLogger().info("Minecraft Database Plugin enabled successfully!");
+            getLogger().info("Database access commands registered");
             logDatabaseStats();
             
         } catch (Exception e) {
@@ -232,6 +250,10 @@ public class MinecraftDBPlugin extends JavaPlugin {
     
     public SocketServer getSocketServer() {
         return socketServer;
+    }
+    
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
     }
 }
 

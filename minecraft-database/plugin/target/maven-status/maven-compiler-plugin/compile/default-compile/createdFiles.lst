@@ -7,7 +7,9 @@ com/brainrot/mcdb/socket/ProtocolParser.class
 com/brainrot/mcdb/socket/ProtocolParser$SocketMessage.class
 com/brainrot/mcdb/socket/SocketServer$ClientHandler.class
 com/brainrot/mcdb/models/DataEntry.class
+com/brainrot/mcdb/commands/DatabaseCommands.class
 com/brainrot/mcdb/database/DataEncoder.class
 com/brainrot/mcdb/models/DataAddress.class
 com/brainrot/mcdb/socket/CommandHandler.class
 com/brainrot/mcdb/models/BlockPosition.class
+com/brainrot/mcdb/utils/PermissionManager.class

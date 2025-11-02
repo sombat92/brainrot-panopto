@@ -36,8 +36,8 @@ database:
   
   storage:
     # Y-level range for data storage
-    min-y: 5      # Start at Y=5 (above bedrock)
-    max-y: 250    # Up to Y=250
+    min-y: 64     # Start at Y=64 (ground/spawn level)
+    max-y: 250    # Up to Y=250 (expanded for more capacity)
     
     # Encoding method: "simple" (16 blocks = 4 bits) or "advanced" (256 blocks = 8 bits)
     encoding: "simple"
